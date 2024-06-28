@@ -3,8 +3,8 @@ package dbs
 import (
 	"context"
 	"database/sql"
-	"github.com/iwind/TeaGo/logs"
-	"github.com/iwind/TeaGo/maps"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/maps"
 	"sync/atomic"
 )
 

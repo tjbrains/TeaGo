@@ -2,7 +2,7 @@ package files
 
 import (
 	"testing"
-	"github.com/iwind/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/Tea"
 )
 
 func TestWriter_Write(t *testing.T) {

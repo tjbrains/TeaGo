@@ -2,7 +2,7 @@ package sessions
 
 import (
 	"testing"
-	"github.com/iwind/TeaGo/actions"
+	"github.com/tjbrains/TeaGo/actions"
 	"time"
 )
 

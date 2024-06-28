@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/go-sql-driver/mysql"
-	"github.com/iwind/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/logs"
 	"strconv"
 	"sync"
 	"time"

@@ -1,7 +1,7 @@
 package lists
 
 import (
-	"github.com/iwind/TeaGo/types"
+	"github.com/tjbrains/TeaGo/types"
 	"reflect"
 	"sort"
 	"strings"

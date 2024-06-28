@@ -4,7 +4,7 @@ import (
 	"net"
 	"log"
 	"bufio"
-	"github.com/iwind/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/logs"
 )
 
 type Server struct {

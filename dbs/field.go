@@ -1,7 +1,7 @@
 package dbs
 
 import (
-	"github.com/iwind/TeaGo/types"
+	"github.com/tjbrains/TeaGo/types"
 	"reflect"
 	"strings"
 )

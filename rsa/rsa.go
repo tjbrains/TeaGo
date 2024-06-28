@@ -1,13 +1,13 @@
 package rsa
 
 import (
-	"github.com/iwind/TeaGo/files"
+	"github.com/tjbrains/TeaGo/files"
 	"encoding/pem"
 	"crypto/x509"
 	"crypto/rsa"
 	"encoding/base64"
 	"crypto/rand"
-	"github.com/iwind/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/logs"
 )
 
 type RSA struct {

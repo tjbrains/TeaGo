@@ -1,7 +1,7 @@
 package dbs
 
 import (
-	"github.com/iwind/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/logs"
 	"testing"
 )
 

@@ -1,9 +1,9 @@
 package TeaGo
 
 import (
-	"github.com/iwind/TeaGo/Tea"
-	"github.com/iwind/TeaGo/logs"
-	"github.com/iwind/TeaGo/utils/string"
+	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/utils/string"
 	"gopkg.in/yaml.v3"
 	"io"
 	"net/http"

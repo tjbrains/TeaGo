@@ -1,8 +1,8 @@
 package Tea
 
 import (
-	"github.com/iwind/TeaGo/logs"
-	"github.com/iwind/TeaGo/utils/string"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/utils/string"
 	"os"
 	"path/filepath"
 	"runtime"

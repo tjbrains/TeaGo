@@ -1,7 +1,7 @@
 package files
 
 import (
-	"github.com/iwind/TeaGo/lists"
+	"github.com/tjbrains/TeaGo/lists"
 	"strings"
 )
 

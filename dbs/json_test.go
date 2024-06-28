@@ -3,7 +3,7 @@
 package dbs_test
 
 import (
-	"github.com/iwind/TeaGo/dbs"
+	"github.com/tjbrains/TeaGo/dbs"
 	"testing"
 )
 

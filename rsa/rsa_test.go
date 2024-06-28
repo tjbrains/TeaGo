@@ -1,8 +1,8 @@
 package rsa
 
 import (
+	"github.com/tjbrains/TeaGo/Tea"
 	"testing"
-	"github.com/iwind/TeaGo/Tea"
 )
 
 func TestRSA_Encrypt(t *testing.T) {

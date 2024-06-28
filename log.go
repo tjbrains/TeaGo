@@ -3,7 +3,7 @@ package TeaGo
 import (
 	"time"
 	"net/http"
-	"github.com/iwind/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/logs"
 	"io"
 	"os"
 	"log"

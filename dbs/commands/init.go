@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/iwind/TeaGo/cmd"
+	"github.com/tjbrains/TeaGo/cmd"
 )
 
 func init() {

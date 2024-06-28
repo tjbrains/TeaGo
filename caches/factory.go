@@ -1,7 +1,7 @@
 package caches
 
 import (
-	"github.com/iwind/TeaGo/timers"
+	"github.com/tjbrains/TeaGo/timers"
 	"sync"
 	"time"
 )

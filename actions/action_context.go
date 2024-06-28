@@ -1,7 +1,7 @@
 package actions
 
 import (
-	"github.com/iwind/TeaGo/maps"
+	"github.com/tjbrains/TeaGo/maps"
 	"sync"
 )
 

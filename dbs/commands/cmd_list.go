@@ -1,13 +1,13 @@
 package commands
 
 import (
-	"github.com/iwind/TeaGo/Tea"
-	"github.com/iwind/TeaGo/cmd"
-	"github.com/iwind/TeaGo/dbs"
-	"github.com/iwind/TeaGo/files"
-	"github.com/iwind/TeaGo/lists"
-	"github.com/iwind/TeaGo/logs"
-	"github.com/iwind/TeaGo/utils/time"
+	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/cmd"
+	"github.com/tjbrains/TeaGo/dbs"
+	"github.com/tjbrains/TeaGo/files"
+	"github.com/tjbrains/TeaGo/lists"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/utils/time"
 	"os"
 	"regexp"
 	"strings"

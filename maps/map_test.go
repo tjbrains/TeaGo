@@ -1,7 +1,7 @@
 package maps
 
 import (
-	"github.com/iwind/TeaGo/assert"
+	"github.com/tjbrains/TeaGo/assert"
 	"testing"
 )
 

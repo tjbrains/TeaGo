@@ -3,8 +3,8 @@ package assert
 import (
 	"bytes"
 	"fmt"
-	"github.com/iwind/TeaGo/types"
-	stringutil "github.com/iwind/TeaGo/utils/string"
+	"github.com/tjbrains/TeaGo/types"
+	stringutil "github.com/tjbrains/TeaGo/utils/string"
 	"os"
 	"path/filepath"
 	"reflect"

@@ -1,8 +1,8 @@
 package assert_test
 
 import (
-	"github.com/iwind/TeaGo/assert"
-	"github.com/iwind/TeaGo/maps"
+	"github.com/tjbrains/TeaGo/assert"
+	"github.com/tjbrains/TeaGo/maps"
 	"reflect"
 	"testing"
 	"time"

@@ -2,10 +2,10 @@ package commands
 
 import (
 	"fmt"
-	"github.com/iwind/TeaGo/cmd"
-	"github.com/iwind/TeaGo/dbs"
-	"github.com/iwind/TeaGo/types"
-	stringutil "github.com/iwind/TeaGo/utils/string"
+	"github.com/tjbrains/TeaGo/cmd"
+	"github.com/tjbrains/TeaGo/dbs"
+	"github.com/tjbrains/TeaGo/types"
+	stringutil "github.com/tjbrains/TeaGo/utils/string"
 	"regexp"
 )
 

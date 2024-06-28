@@ -2,7 +2,7 @@ package commands
 
 import (
 	"testing"
-	"github.com/iwind/TeaGo/cmd"
+	"github.com/tjbrains/TeaGo/cmd"
 )
 
 func TestExecCommand_Run(t *testing.T) {

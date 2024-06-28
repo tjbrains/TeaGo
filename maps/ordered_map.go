@@ -1,8 +1,8 @@
 package maps
 
 import (
-	"github.com/iwind/TeaGo/lists"
-	"github.com/iwind/TeaGo/types"
+	"github.com/tjbrains/TeaGo/lists"
+	"github.com/tjbrains/TeaGo/types"
 )
 
 type OrderedMap struct {

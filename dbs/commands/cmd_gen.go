@@ -4,12 +4,12 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/iwind/TeaGo/Tea"
-	"github.com/iwind/TeaGo/cmd"
-	"github.com/iwind/TeaGo/dbs"
-	"github.com/iwind/TeaGo/files"
-	"github.com/iwind/TeaGo/lists"
-	"github.com/iwind/TeaGo/utils/string"
+	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/cmd"
+	"github.com/tjbrains/TeaGo/dbs"
+	"github.com/tjbrains/TeaGo/files"
+	"github.com/tjbrains/TeaGo/lists"
+	"github.com/tjbrains/TeaGo/utils/string"
 	"go/format"
 	"os"
 	"path/filepath"
@@ -123,7 +123,7 @@ func (this *GenModelCommand) Run() {
 	var modelString = `package ` + subPackage
 	modelString += `
 
-import "github.com/iwind/TeaGo/dbs"`
+import "github.com/tjbrains/TeaGo/dbs"`
 
 	// fields
 	modelString += "\n"
@@ -249,8 +249,8 @@ func New` + model + `Operator() *` + model + `Operator {
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/iwind/TeaGo/dbs"
-	"github.com/iwind/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/dbs"
+	"github.com/tjbrains/TeaGo/Tea"
 )
 `
 
@@ -366,7 +366,7 @@ func (this *${daoName}) Find${model}Name(tx *dbs.Tx, ${pkName} ${pkNameType}) (s
 	testString := `package ` + subPackage + `_test
 import (
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/iwind/TeaGo/bootstrap"
+	_ "github.com/tjbrains/TeaGo/bootstrap"
 )
 `
 	formatted, err = format.Source([]byte(testString))

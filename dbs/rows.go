@@ -5,8 +5,8 @@ package dbs
 import (
 	"database/sql"
 	"errors"
-	"github.com/iwind/TeaGo/maps"
-	"github.com/iwind/TeaGo/types"
+	"github.com/tjbrains/TeaGo/maps"
+	"github.com/tjbrains/TeaGo/types"
 )
 
 type Rows struct {

@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/iwind/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/logs"
 	"os"
 	"strings"
 )

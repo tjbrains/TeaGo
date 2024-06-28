@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/iwind/TeaGo/gohtml/atom"
+	"github.com/tjbrains/TeaGo/gohtml/atom"
 )
 
 // A TokenType is the type of a Token.

@@ -3,8 +3,8 @@ package actions
 import (
 	"compress/flate"
 	"compress/gzip"
-	"github.com/iwind/TeaGo/logs"
-	"github.com/iwind/TeaGo/types"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/types"
 	"regexp"
 )
 

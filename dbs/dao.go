@@ -3,7 +3,7 @@ package dbs
 import (
 	"errors"
 	"fmt"
-	"github.com/iwind/TeaGo/types"
+	"github.com/tjbrains/TeaGo/types"
 	"log"
 	"reflect"
 	"time"

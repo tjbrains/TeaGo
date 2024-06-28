@@ -3,7 +3,7 @@ package cmd
 import (
 	"errors"
 	"log"
-	"github.com/iwind/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/logs"
 	"reflect"
 )
 

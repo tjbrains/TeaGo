@@ -13,7 +13,7 @@
 ~~~go
 package hello
 
-import "github.com/iwind/TeaGo/actions"
+import "github.com/tjbrains/TeaGo/actions"
 
 type IndexAction actions.Action
 
@@ -27,7 +27,7 @@ func (this *IndexAction) Run()  {
 ~~~go
 package hello
 
-import "github.com/iwind/TeaGo/actions"
+import "github.com/tjbrains/TeaGo/actions"
 
 type IndexAction actions.Action
 
@@ -47,7 +47,7 @@ func (this *IndexAction) Run(params struct {
 package MyProject
 
 import (
-	"github.com/iwind/TeaGo"
+	"github.com/tjbrains/TeaGo"
 	"github.com/iwind/MyProject/actions/default/hello/index"
 )
 

@@ -1,7 +1,7 @@
 package sessions
 
 import (
-	"github.com/iwind/TeaGo/actions"
+	"github.com/tjbrains/TeaGo/actions"
 	"sync"
 	"time"
 )

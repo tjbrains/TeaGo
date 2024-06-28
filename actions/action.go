@@ -1,9 +1,9 @@
 package actions
 
 import (
-	"github.com/iwind/TeaGo/lists"
-	"github.com/iwind/TeaGo/logs"
-	"github.com/iwind/TeaGo/types"
+	"github.com/tjbrains/TeaGo/lists"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/types"
 	"net/http"
 	"path/filepath"
 	"reflect"

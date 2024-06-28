@@ -2,7 +2,7 @@ package dbs
 
 import (
 	"database/sql"
-	"github.com/iwind/TeaGo/maps"
+	"github.com/tjbrains/TeaGo/maps"
 )
 
 // Stmt SQL语句

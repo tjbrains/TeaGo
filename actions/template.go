@@ -2,8 +2,8 @@ package actions
 
 import (
 	"bytes"
-	"github.com/iwind/TeaGo/logs"
-	"github.com/iwind/TeaGo/maps"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/maps"
 	"io"
 	"text/template"
 )

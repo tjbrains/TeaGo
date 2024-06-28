@@ -6,7 +6,7 @@ import (
 )
 
 func TestSortSize(t *testing.T) {
-	files := NewFile(os.Getenv("GOPATH") + "/src/github.com/iwind/TeaGo").List()
+	files := NewFile(os.Getenv("GOPATH") + "/src/github.com/tjbrains/TeaGo").List()
 
 	Sort(files, SortTypeSize)
 
@@ -21,7 +21,7 @@ func TestSortSize(t *testing.T) {
 }
 
 func TestSortKind(t *testing.T) {
-	files := NewFile(os.Getenv("GOPATH") + "/src/github.com/iwind/TeaGo").List()
+	files := NewFile(os.Getenv("GOPATH") + "/src/github.com/tjbrains/TeaGo").List()
 
 	Sort(files, SortTypeKind)
 
@@ -35,7 +35,7 @@ func TestSortKind(t *testing.T) {
 }
 
 func TestSortKindReverse(t *testing.T) {
-	files := NewFile(os.Getenv("GOPATH") + "/src/github.com/iwind/TeaGo").List()
+	files := NewFile(os.Getenv("GOPATH") + "/src/github.com/tjbrains/TeaGo").List()
 
 	Sort(files, SortTypeKindReverse)
 

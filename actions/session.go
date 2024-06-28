@@ -1,7 +1,7 @@
 package actions
 
 import (
-	"github.com/iwind/TeaGo/types"
+	"github.com/tjbrains/TeaGo/types"
 	"fmt"
 )
 

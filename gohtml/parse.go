@@ -10,7 +10,7 @@ import (
 	"io"
 	"strings"
 
-	a "github.com/iwind/TeaGo/gohtml/atom"
+	a "github.com/tjbrains/TeaGo/gohtml/atom"
 )
 
 // A parser implements the HTML5 parsing algorithm:

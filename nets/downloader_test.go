@@ -3,8 +3,8 @@ package nets
 import (
 	"testing"
 	"time"
-	"github.com/iwind/TeaGo/utils/time"
-	"github.com/iwind/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/utils/time"
+	"github.com/tjbrains/TeaGo/logs"
 )
 
 func TestDownloaderItem_Start(t *testing.T) {

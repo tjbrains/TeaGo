@@ -1,10 +1,10 @@
 package commands
 
 import (
-	"github.com/iwind/TeaGo/cmd"
-	"github.com/iwind/TeaGo/types"
+	"github.com/tjbrains/TeaGo/cmd"
+	"github.com/tjbrains/TeaGo/types"
 	"fmt"
-	"github.com/iwind/TeaGo/dbs"
+	"github.com/tjbrains/TeaGo/dbs"
 )
 
 type FixCommand struct {

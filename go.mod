@@ -1,4 +1,4 @@
-module github.com/iwind/TeaGo
+module github.com/tjbrains/TeaGo
 
 go 1.21
 

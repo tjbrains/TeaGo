@@ -3,8 +3,8 @@ package dbs
 import (
 	"encoding/json"
 	"fmt"
-	_ "github.com/iwind/TeaGo/bootstrap"
-	"github.com/iwind/TeaGo/maps"
+	_ "github.com/tjbrains/TeaGo/bootstrap"
+	"github.com/tjbrains/TeaGo/maps"
 	"log"
 	"testing"
 	"time"

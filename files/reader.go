@@ -2,8 +2,8 @@ package files
 
 import (
 	"encoding/json"
-	"github.com/iwind/TeaGo/logs"
-	"github.com/iwind/TeaGo/maps"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/maps"
 	"gopkg.in/yaml.v3"
 	"io"
 	"os"

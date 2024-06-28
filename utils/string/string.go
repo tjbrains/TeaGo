@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/iwind/TeaGo/rands"
+	"github.com/tjbrains/TeaGo/rands"
 	"hash"
 	"math"
 	"regexp"

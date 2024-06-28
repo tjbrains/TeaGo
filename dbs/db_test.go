@@ -2,7 +2,7 @@ package dbs
 
 import (
 	"encoding/json"
-	"github.com/iwind/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/logs"
 	"log"
 	"testing"
 	"time"

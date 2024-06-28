@@ -4,7 +4,7 @@ package processes
 
 import (
 	"errors"
-	"github.com/iwind/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/Tea"
 	"os"
 	"syscall"
 )

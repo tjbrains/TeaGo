@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/iwind/TeaGo/cmd"
-	_ "github.com/iwind/TeaGo/dbs/commands"
-	"github.com/iwind/TeaGo/lists"
+	"github.com/tjbrains/TeaGo/cmd"
+	_ "github.com/tjbrains/TeaGo/dbs/commands"
+	"github.com/tjbrains/TeaGo/lists"
 	"os"
 	"time"
 )

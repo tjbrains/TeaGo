@@ -5,7 +5,7 @@
 package gohtml
 
 import (
-	"github.com/iwind/TeaGo/gohtml/atom"
+	"github.com/tjbrains/TeaGo/gohtml/atom"
 )
 
 // A NodeType is the type of a Node.

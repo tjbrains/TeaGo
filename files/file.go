@@ -2,9 +2,9 @@ package files
 
 import (
 	"fmt"
-	"github.com/iwind/TeaGo/Tea"
-	"github.com/iwind/TeaGo/logs"
-	"github.com/iwind/TeaGo/utils/string"
+	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/utils/string"
 	"io"
 	"os"
 	"path/filepath"

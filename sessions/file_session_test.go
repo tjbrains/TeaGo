@@ -7,8 +7,8 @@ import (
 	"encoding/base64"
 	"time"
 	"sync"
-	"github.com/iwind/TeaGo/Tea"
-	"github.com/iwind/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/logs"
 )
 
 func TestFileSessionManager_Init(t *testing.T) {

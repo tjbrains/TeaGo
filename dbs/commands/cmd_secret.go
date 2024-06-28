@@ -1,9 +1,9 @@
 package commands
 
 import (
-	"github.com/iwind/TeaGo/cmd"
-	"github.com/iwind/TeaGo/types"
-	"github.com/iwind/TeaGo/utils/string"
+	"github.com/tjbrains/TeaGo/cmd"
+	"github.com/tjbrains/TeaGo/types"
+	"github.com/tjbrains/TeaGo/utils/string"
 )
 
 type SecretCommand struct {
