@@ -62,6 +62,8 @@ func BeforeStop(fn func(server *Server)) {
 	beforeStopFunctions = append(beforeStopFunctions, fn)
 }
 
+var actionPathRegexp = regexp.MustCompile(`:(\w+)(\s*(\([^)]+\))?)`)
+
 // Server Web服务
 type Server struct {
 	singleInstance bool
@@ -95,7 +97,7 @@ type Server struct {
 // ServerRoutePattern 路由配置
 type ServerRoutePattern struct {
 	module  string
-	reg     regexp.Regexp
+	reg     *regexp.Regexp
 	names   []string
 	method  string
 	runFunc func(writer http.ResponseWriter, request *http.Request)
@@ -216,7 +218,7 @@ func (this *Server) StartOn(address string) {
 			defer this.logWriter.Print(time.Now(), writer.(*responseWriter), request)
 		}
 
-		ext := strings.ToLower(filepath.Ext(request.URL.Path))
+		var ext = strings.ToLower(filepath.Ext(request.URL.Path))
 		if stringutil.Contains([]string{".html", ""}, ext) || strings.HasPrefix(filepath.Base(request.URL.Path), ".") { // 禁止访问html文件、目录、隐藏文件（.xxx）
 			http.Error(writer, "No permission to view page", http.StatusForbidden)
 			return
@@ -255,7 +257,7 @@ func (this *Server) StartOn(address string) {
 		var requestPath = request.URL.Path
 
 		// 模块
-		parsedResult := moduleReg.FindAllStringSubmatch(requestPath, -1)
+		var parsedResult = moduleReg.FindAllStringSubmatch(requestPath, -1)
 		var module = ""
 		if len(parsedResult) > 0 {
 			module = parsedResult[0][1]
@@ -265,7 +267,7 @@ func (this *Server) StartOn(address string) {
 		// 路由key
 		var key string
 		if len(module) > 0 {
-			key = module + "/" + requestPath + "__MELOY__" + request.Method
+			key = "/" + module + requestPath + "__MELOY__" + request.Method
 		} else {
 			key = requestPath + "__MELOY__" + request.Method
 		}
@@ -276,7 +278,19 @@ func (this *Server) StartOn(address string) {
 			return
 		}
 
-		// 支持 *
+		// 支持 * 路由
+		if len(module) > 0 {
+			key = "/" + module + "*" + "__MELOY__" + request.Method
+		} else {
+			key = "*" + "__MELOY__" + request.Method
+		}
+		runFunc, found = this.directRoutes[key]
+		if found {
+			runFunc(writer, request)
+			return
+		}
+
+		// 支持 * 方法 （代表所有请求方法）
 		key = requestPath + "__MELOY__*"
 		runFunc, found = this.directRoutes[key]
 		if found {
@@ -481,14 +495,9 @@ func (this *Server) router(pattern string, method string, actionPtr interface{})
 	method = strings.ToUpper(method)
 
 	// 是否包含匹配参数 :paramName(pattern)
-	reg, err := regexp.Compile(`:(\w+)(\s*(\([^)]+\))?)`)
-	if err != nil {
-		logs.Errorf("%s", err.Error())
-		return
-	}
-
-	matches := reg.FindAllStringSubmatch(pattern, 10)
-	names := []string{}
+	var reg = actionPathRegexp
+	var matches = reg.FindAllStringSubmatch(pattern, 10)
+	var names = []string{}
 	for _, match := range matches {
 		names = append(names, match[1])
 		if len(match[3]) > 0 {
@@ -498,11 +507,12 @@ func (this *Server) router(pattern string, method string, actionPtr interface{})
 		}
 	}
 
+	var err error
 	reg, err = regexp.Compile("^" + pattern + "$")
 	if err == nil && len(names) > 0 {
 		var routePattern = ServerRoutePattern{
 			module:  this.lastModule,
-			reg:     *reg,
+			reg:     reg,
 			names:   names,
 			method:  method,
 			runFunc: this.buildHandle(actionPtr),
@@ -514,7 +524,7 @@ func (this *Server) router(pattern string, method string, actionPtr interface{})
 	// 正常的路由
 	var key string
 	if len(this.lastModule) > 0 {
-		key = this.lastModule + "/" + pattern + "__MELOY__" + method
+		key = "/" + this.lastModule + pattern + "__MELOY__" + method
 	} else {
 		key = pattern + "__MELOY__" + method
 	}
@@ -582,10 +592,10 @@ func (this *Server) buildHandle(actionPtr interface{}) func(writer http.Response
 		}
 	}
 
-	spec := actions.NewActionSpec(actionPtr.(actions.ActionWrapper))
+	var spec = actions.NewActionSpec(actionPtr.(actions.ActionWrapper))
 	spec.Module = this.lastModule
 
-	var helpers = append([]interface{}{}, this.lastHelpers...)
+	var helpers = append([]any{}, this.lastHelpers...)
 	var data = actions.Data{}
 	if this.lastData != nil {
 		for k, v := range this.lastData {
@@ -608,7 +618,7 @@ func (this *Server) buildHandle(actionPtr interface{}) func(writer http.Response
 			}
 			err := request.ParseMultipartForm(maxSize)
 			if err != nil {
-				err := request.ParseForm()
+				err = request.ParseForm()
 				if err != nil {
 					logs.Error(err)
 				}

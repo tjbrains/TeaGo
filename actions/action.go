@@ -112,12 +112,12 @@ func runActionCopy(spec *ActionSpec,
 	}()
 
 	// 设置模板
-	pkgPath := spec.PkgPath
-	className := spec.ClassName
-	actionPkg := pkgPath[strings.LastIndex(pkgPath, "/actions/")+len("/actions/"):]
-	actionClass := strings.TrimSuffix(className[strings.LastIndex(className, ".")+1:], "Action")
+	var pkgPath = spec.PkgPath
+	var className = spec.ClassName
+	var actionPkg = pkgPath[strings.LastIndex(pkgPath, "/actions/")+len("/actions/"):]
+	var actionClass = strings.TrimSuffix(className[strings.LastIndex(className, ".")+1:], "Action")
 
-	separatorIndex := strings.Index(actionPkg, "/")
+	var separatorIndex = strings.Index(actionPkg, "/")
 
 	// 如果没有指定模块，则认为@default模块
 	if separatorIndex == -1 {
