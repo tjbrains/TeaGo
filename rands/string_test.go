@@ -41,3 +41,13 @@ func BenchmarkRand_String(b *testing.B) {
 		_ = String(32)
 	}
 }
+
+func BenchmarkRand_HexString(b *testing.B) {
+	runtime.GOMAXPROCS(1)
+
+	b.ReportAllocs()
+
+	for i := 0; i < b.N; i++ {
+		_ = HexString(32)
+	}
+}
