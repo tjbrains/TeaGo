@@ -13,8 +13,8 @@ import (
 func TestStmtManager_PrepareOnce(t *testing.T) {
 	db, err := NewInstanceFromConfig(&DBConfig{
 		Driver: "mysql",
-		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_edge?charset=utf8mb4&timeout=30s",
-		Prefix: "edge",
+		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_cloud?charset=utf8mb4&timeout=30s",
+		Prefix: "cloud",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -24,7 +24,10 @@ func TestStmtManager_PrepareOnce(t *testing.T) {
 		t.Fatal(err)
 	}**/
 
-	for i := 0; i < 100_000; i++ {
+	var stat1 = &runtime.MemStats{}
+	runtime.ReadMemStats(stat1)
+
+	for i := 0; i < 20_000; i++ {
 		stmt, cached, err := db.PrepareOnce("SELECT " + strconv.Itoa(i))
 		if err != nil {
 			t.Log("cached:", cached)
@@ -36,14 +39,18 @@ func TestStmtManager_PrepareOnce(t *testing.T) {
 		_ = stmt
 	}
 
-	t.Log(db.StmtManager().Len())
+	t.Log("stmts count:", db.StmtManager().Len())
+
+	var stat2 = &runtime.MemStats{}
+	runtime.ReadMemStats(stat2)
+	t.Log((stat2.HeapInuse-stat1.HeapInuse)>>20, "MB")
 }
 
 func TestStmtManager_Prepare(t *testing.T) {
 	db, err := NewInstanceFromConfig(&DBConfig{
 		Driver: "mysql",
-		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_edge?charset=utf8mb4&timeout=30s",
-		Prefix: "edge",
+		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_cloud?charset=utf8mb4&timeout=30s",
+		Prefix: "cloud",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -53,7 +60,10 @@ func TestStmtManager_Prepare(t *testing.T) {
 		t.Fatal(err)
 	}**/
 
-	for i := 0; i < 20000; i++ {
+	var stat1 = &runtime.MemStats{}
+	runtime.ReadMemStats(stat1)
+
+	for i := 0; i < 20_000; i++ {
 		stmt, err := db.Prepare("SELECT " + strconv.Itoa(i))
 		if err != nil {
 			t.Fatal(err)
@@ -61,13 +71,19 @@ func TestStmtManager_Prepare(t *testing.T) {
 		_ = stmt.Close()
 		_ = stmt
 	}
+
+	t.Log("stmts count:", db.StmtManager().Len())
+
+	var stat2 = &runtime.MemStats{}
+	runtime.ReadMemStats(stat2)
+	t.Log((stat2.HeapInuse-stat1.HeapInuse)>>20, "MB")
 }
 
 func TestStmtManager_Prepare_Same(t *testing.T) {
 	db, err := NewInstanceFromConfig(&DBConfig{
 		Driver: "mysql",
-		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_edge?charset=utf8mb4&timeout=30s",
-		Prefix: "edge",
+		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_cloud?charset=utf8mb4&timeout=30s",
+		Prefix: "cloud",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -94,8 +110,8 @@ func TestStmtManager_Prepare_Same(t *testing.T) {
 func TestStmtManager_Tx_PrepareOnce(t *testing.T) {
 	db, err := NewInstanceFromConfig(&DBConfig{
 		Driver: "mysql",
-		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_edge?charset=utf8mb4&timeout=30s",
-		Prefix: "edge",
+		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_cloud?charset=utf8mb4&timeout=30s",
+		Prefix: "cloud",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -128,8 +144,8 @@ func TestStmtManager_Tx_PrepareOnce(t *testing.T) {
 func TestStmtManager_DB_Close(t *testing.T) {
 	db, err := NewInstanceFromConfig(&DBConfig{
 		Driver: "mysql",
-		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_edge?charset=utf8mb4&timeout=30s",
-		Prefix: "edge",
+		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_cloud?charset=utf8mb4&timeout=30s",
+		Prefix: "cloud",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -152,8 +168,8 @@ func TestStmtManager_DB_Close(t *testing.T) {
 func TestStmtManager_PreparedStmtCount(t *testing.T) {
 	db, err := NewInstanceFromConfig(&DBConfig{
 		Driver: "mysql",
-		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_edge?charset=utf8mb4&timeout=30s",
-		Prefix: "edge",
+		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_cloud?charset=utf8mb4&timeout=30s",
+		Prefix: "cloud",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -203,8 +219,8 @@ func TestStmtManager_PreparedStmtCount(t *testing.T) {
 func TestStmtManager_GC(t *testing.T) {
 	db, err := NewInstanceFromConfig(&DBConfig{
 		Driver: "mysql",
-		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_edge?charset=utf8mb4&timeout=30s",
-		Prefix: "edge",
+		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_cloud?charset=utf8mb4&timeout=30s",
+		Prefix: "cloud",
 	})
 	if err != nil {
 		t.Fatal(err)

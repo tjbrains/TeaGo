@@ -77,8 +77,8 @@ func TestDBTableNames(t *testing.T) {
 func TestDB_FindPreparedOnes(t *testing.T) {
 	db, err := NewInstanceFromConfig(&DBConfig{
 		Driver: "mysql",
-		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_edge?charset=utf8mb4&timeout=30s",
-		Prefix: "edge",
+		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_cloud?charset=utf8mb4&timeout=30s",
+		Prefix: "cloud",
 	})
 	if err != nil {
 		t.Fatal(err)
