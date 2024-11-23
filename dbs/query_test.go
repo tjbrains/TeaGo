@@ -544,6 +544,8 @@ func BenchmarkQuery_AsSQL2(b *testing.B) {
 		sqlCacheMap["sql"+types.String(i)] = map[string]any{}
 	}
 
+	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		var query = NewQuery(nil)
 		query.Table("users_" + types.String(i%1000))

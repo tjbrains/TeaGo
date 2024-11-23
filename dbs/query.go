@@ -86,7 +86,7 @@ type Query struct {
 
 	sql     string
 	noPk    bool
-	attrs   *maps.OrderedMap
+	attrs   *maps.OrderedMap[string, string]
 	wheres  []string
 	havings []string
 	orders  []QueryOrder
@@ -104,8 +104,8 @@ type Query struct {
 	sqlCache int
 	lock     string
 
-	savingFields    *maps.OrderedMap // 要插入或修改的字段列表
-	replacingFields *maps.OrderedMap // 执行replace的字段列表
+	savingFields    *maps.OrderedMap[string, string] // 要插入或修改的字段列表
+	replacingFields *maps.OrderedMap[string, string] // 执行replace的字段列表
 
 	debug bool
 
@@ -167,9 +167,9 @@ func (this *Query) init(model any) *Query {
 	this.offset = -1
 	this.debug = false
 
-	this.attrs = maps.NewOrderedMap()
-	this.savingFields = maps.NewOrderedMap()
-	this.replacingFields = maps.NewOrderedMap()
+	this.attrs = maps.NewOrderedMap[string, string]()
+	this.savingFields = maps.NewOrderedMap[string, string]()
+	this.replacingFields = maps.NewOrderedMap[string, string]()
 
 	this.namedParams = map[string]any{}
 	this.namedParamIndex = 0
@@ -720,8 +720,8 @@ func (this *Query) AsSQL() (string, error) {
 			if this.savingFields.Len() > 0 {
 				var mapping = []string{}
 				this.savingFields.SortKeys()
-				this.savingFields.Range(func(field any, value any) {
-					mapping = append(mapping, this.wrapKeyword(field.(string))+"="+value.(string))
+				this.savingFields.Range(func(field string, value string) {
+					mapping = append(mapping, this.wrapKeyword(field)+"="+value)
 				})
 				sqlString += " " + strings.Join(mapping, ", ")
 			}
@@ -732,9 +732,9 @@ func (this *Query) AsSQL() (string, error) {
 				var fieldNames = []string{}
 				var fieldValues = []string{}
 				this.savingFields.SortKeys()
-				this.savingFields.Range(func(field any, value any) {
-					fieldNames = append(fieldNames, this.wrapKeyword(field.(string)))
-					fieldValues = append(fieldValues, value.(string))
+				this.savingFields.Range(func(field string, value string) {
+					fieldNames = append(fieldNames, this.wrapKeyword(field))
+					fieldValues = append(fieldValues, value)
 				})
 				sqlString += " (" + strings.Join(fieldNames, ", ") + ") VALUES (" + strings.Join(fieldValues, ", ") + ")"
 			}
@@ -744,9 +744,9 @@ func (this *Query) AsSQL() (string, error) {
 				var fieldNames = []string{}
 				var fieldValues = []string{}
 				this.savingFields.SortKeys()
-				this.savingFields.Range(func(field any, value any) {
-					fieldNames = append(fieldNames, this.wrapKeyword(field.(string)))
-					fieldValues = append(fieldValues, value.(string))
+				this.savingFields.Range(func(field string, value string) {
+					fieldNames = append(fieldNames, this.wrapKeyword(field))
+					fieldValues = append(fieldValues, value)
 				})
 				sqlString += " (" + strings.Join(fieldNames, ", ") + ") VALUES (" + strings.Join(fieldValues, ", ") + ")"
 			}
@@ -756,9 +756,9 @@ func (this *Query) AsSQL() (string, error) {
 				var fieldNames = []string{}
 				var fieldValues = []string{}
 				this.savingFields.SortKeys()
-				this.savingFields.Range(func(field any, value any) {
-					fieldNames = append(fieldNames, this.wrapKeyword(field.(string)))
-					fieldValues = append(fieldValues, value.(string))
+				this.savingFields.Range(func(field string, value string) {
+					fieldNames = append(fieldNames, this.wrapKeyword(field))
+					fieldValues = append(fieldValues, value)
 				})
 				sqlString += " (" + strings.Join(fieldNames, ", ") + ") VALUES (" + strings.Join(fieldValues, ", ") + ")"
 			}
@@ -768,8 +768,8 @@ func (this *Query) AsSQL() (string, error) {
 			if this.replacingFields.Len() > 0 {
 				var mapping = []string{}
 				this.replacingFields.SortKeys()
-				this.replacingFields.Range(func(field any, value any) {
-					mapping = append(mapping, this.wrapKeyword(field.(string))+"="+value.(string))
+				this.replacingFields.Range(func(field string, value string) {
+					mapping = append(mapping, this.wrapKeyword(field)+"="+value)
 				})
 				sqlString += strings.Join(mapping, ", ")
 			}
@@ -781,8 +781,8 @@ func (this *Query) AsSQL() (string, error) {
 	// attrs
 	var wheres = []string{}
 	if this.attrs.Len() > 0 {
-		this.attrs.Range(func(_ any, placeholder any) {
-			wheres = append(wheres, placeholder.(string))
+		this.attrs.Range(func(_ string, placeholder string) {
+			wheres = append(wheres, placeholder)
 		})
 	}
 

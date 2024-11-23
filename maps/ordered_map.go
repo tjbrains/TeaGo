@@ -1,28 +1,30 @@
 package maps
 
 import (
+	"cmp"
 	"github.com/tjbrains/TeaGo/lists"
 	"github.com/tjbrains/TeaGo/types"
+	"slices"
 )
 
-type OrderedMap struct {
-	keys      []interface{}
-	valuesMap map[interface{}]interface{}
+type OrderedMap[K cmp.Ordered, V any] struct {
+	keys      []K
+	valuesMap map[K]V
 }
 
-func NewOrderedMap() *OrderedMap {
-	return &OrderedMap{
-		valuesMap: map[interface{}]interface{}{},
+func NewOrderedMap[K cmp.Ordered, V any]() *OrderedMap[K, V] {
+	return &OrderedMap[K, V]{
+		valuesMap: map[K]V{},
 	}
 }
 
 // Keys 取得所有Key
-func (this *OrderedMap) Keys() []interface{} {
+func (this *OrderedMap[K, V]) Keys() []K {
 	return this.keys
 }
 
 // Sort 根据元素值进行排序
-func (this *OrderedMap) Sort() {
+func (this *OrderedMap[K, V]) Sort() {
 	lists.Sort(this.keys, func(i int, j int) bool {
 		var value1 = this.valuesMap[this.keys[i]]
 		var value2 = this.valuesMap[this.keys[j]]
@@ -32,24 +34,17 @@ func (this *OrderedMap) Sort() {
 }
 
 // SortKeys 根据Key进行排序
-func (this *OrderedMap) SortKeys() {
-	lists.Sort(this.keys, func(i int, j int) bool {
-		var key1 = this.keys[i]
-		var key2 = this.keys[j]
-
-		return types.Compare(key1, key2) <= 0
-	})
+func (this *OrderedMap[K, V]) SortKeys() {
+	slices.Sort[[]K, K](this.keys)
 }
 
 // Reverse 翻转键
-func (this *OrderedMap) Reverse() {
-	lists.Sort(this.keys, func(i int, j int) bool {
-		return i > j
-	})
+func (this *OrderedMap[K, V]) Reverse() {
+	slices.Reverse(this.keys)
 }
 
 // Put 添加元素
-func (this *OrderedMap) Put(key interface{}, value interface{}) {
+func (this *OrderedMap[K, V]) Put(key K, value V) {
 	_, ok := this.valuesMap[key]
 	if !ok {
 		this.keys = append(this.keys, key)
@@ -58,13 +53,13 @@ func (this *OrderedMap) Put(key interface{}, value interface{}) {
 }
 
 // Get 取得元素值
-func (this *OrderedMap) Get(key interface{}) (value interface{}, ok bool) {
+func (this *OrderedMap[K, V]) Get(key K) (value V, ok bool) {
 	value, ok = this.valuesMap[key]
 	return
 }
 
 // Delete 删除元素
-func (this *OrderedMap) Delete(key interface{}) {
+func (this *OrderedMap[K, V]) Delete(key K) {
 	var index = -1
 	for itemIndex, itemKey := range this.keys {
 		if itemKey == key {
@@ -79,13 +74,13 @@ func (this *OrderedMap) Delete(key interface{}) {
 }
 
 // Range 对每个元素执行迭代器
-func (this *OrderedMap) Range(iterator func(key interface{}, value interface{})) {
+func (this *OrderedMap[K, V]) Range(iterator func(key K, value V)) {
 	for _, key := range this.keys {
 		iterator(key, this.valuesMap[key])
 	}
 }
 
 // Len 取得Map的长度
-func (this *OrderedMap) Len() int {
+func (this *OrderedMap[K, V]) Len() int {
 	return len(this.keys)
 }
