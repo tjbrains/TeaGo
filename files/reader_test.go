@@ -1,12 +1,13 @@
-package files
+package files_test
 
 import (
-	"testing"
 	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/files"
+	"testing"
 )
 
 func TestReader_ReadByte(t *testing.T) {
-	reader, err := NewReader(Tea.TmpFile("test.txt"))
+	reader, err := files.NewReader(Tea.TmpFile("test.txt"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,7 +28,7 @@ func TestReader_ReadByte(t *testing.T) {
 }
 
 func TestReader_Read(t *testing.T) {
-	file := NewFile(Tea.TmpFile("test.txt"))
+	var file = files.NewFile(Tea.TmpFile("test.txt"))
 	reader, err := file.Reader()
 	if err != nil {
 		t.Fatal(err)
@@ -49,7 +50,7 @@ func TestReader_Read(t *testing.T) {
 }
 
 func TestReader_ReadLine(t *testing.T) {
-	file := NewFile(Tea.TmpFile("test.txt"))
+	var file = files.NewFile(Tea.TmpFile("test.txt"))
 	reader, err := file.Reader()
 	if err != nil {
 		t.Fatal(err)
@@ -71,7 +72,7 @@ func TestReader_ReadLine(t *testing.T) {
 }
 
 func TestReader_ReadAll(t *testing.T) {
-	file := NewFile(Tea.TmpFile("test.txt"))
+	var file = files.NewFile(Tea.TmpFile("test.txt"))
 	reader, err := file.Reader()
 	if err != nil {
 		t.Fatal(err)
@@ -86,7 +87,7 @@ func TestReader_ReadAll(t *testing.T) {
 }
 
 func TestReader_ReadJSON(t *testing.T) {
-	file := NewFile(Tea.TmpFile("test.json"))
+	var file = files.NewFile(Tea.TmpFile("test.json"))
 	reader, err := file.Reader()
 	if err != nil {
 		t.Fatal(err)
@@ -104,7 +105,7 @@ func TestReader_ReadJSON(t *testing.T) {
 }
 
 func TestReader_ReadYAML(t *testing.T) {
-	reader, err := NewReader(Tea.ConfigFile("server.conf"))
+	reader, err := files.NewReader(Tea.ConfigFile("server.conf"))
 	if err != nil {
 		t.Fatal(err)
 	}

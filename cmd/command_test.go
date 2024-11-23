@@ -1,11 +1,12 @@
-package cmd
+package cmd_test
 
 import (
+	"github.com/tjbrains/TeaGo/cmd"
 	"testing"
 )
 
 type testCommand struct {
-	*Command
+	*cmd.Command
 }
 
 func (command *testCommand) Codes() []string {
@@ -18,14 +19,6 @@ func (command *testCommand) Run() {
 
 func TestRegister(t *testing.T) {
 	var command = &testCommand{}
-	Register(command)
-	t.Log(Run("test"))
-}
-
-func TestCommand_Param(t *testing.T) {
-	commandArgs = []string{"-name", "-age=20"}
-	cmd := &Command{}
-	t.Log(cmd.Param("name"))
-	t.Log(cmd.Param("age"))
-	t.Log(cmd.Param("hello"))
+	cmd.Register(command)
+	t.Log(cmd.Run("test"))
 }

@@ -45,7 +45,7 @@ func (this Map) Keys() []interface{} {
 
 // Values 取得所有值
 func (this Map) Values() []interface{} {
-	m := []interface{}{}
+	m := []any{}
 	for _, value := range this {
 		m = append(m, value)
 	}
@@ -59,7 +59,7 @@ func (this Map) Has(key string) bool {
 }
 
 // Get 取得键值
-func (this Map) Get(key string) interface{} {
+func (this Map) Get(key string) any {
 	return this[key]
 }
 
@@ -129,7 +129,7 @@ func (this Map) GetFloat64(key string) float64 {
 }
 
 // Increase 给某个键值增加数值（可以为负），并返回操作后的值
-func (this Map) Increase(key string, delta interface{}) interface{} {
+func (this Map) Increase(key string, delta any) any {
 	value, found := this[key]
 	if !found || value == nil {
 		this[key] = delta
@@ -180,12 +180,12 @@ func (this Map) GetMap(key string) Map {
 }
 
 // GetSlice 取得Slice类型的键值
-func (this Map) GetSlice(key string) []interface{} {
+func (this Map) GetSlice(key string) []any {
 	value, found := this[key]
 	if !found || value == nil || reflect.TypeOf(value).Kind() != reflect.Slice {
 		return nil
 	}
-	result := []interface{}{}
+	result := []any{}
 	v := reflect.ValueOf(value)
 	count := v.Len()
 	for i := 0; i < count; i++ {
@@ -223,7 +223,7 @@ func (this Map) Delete(key ...string) {
 }
 
 // Put 添加键值
-func (this Map) Put(key string, value interface{}) {
+func (this Map) Put(key string, value any) {
 	this[key] = value
 }
 
@@ -232,8 +232,8 @@ func (this Map) Len() int {
 	return len(this)
 }
 
-// GoMap 转换为map[string]interface{}
-func (this Map) GoMap() map[string]interface{} {
+// GoMap 转换为map[string]any
+func (this Map) GoMap() map[string]any {
 	return this
 }
 

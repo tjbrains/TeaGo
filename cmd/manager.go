@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"errors"
-	"log"
 	"github.com/tjbrains/TeaGo/logs"
+	"log"
 	"reflect"
 )
 
@@ -50,7 +50,7 @@ func Run(code string) error {
 	return nil
 }
 
-// 尝试执行命令行
+// Try 尝试执行命令行
 func Try(args []string) bool {
 	commandArgs = args
 
@@ -68,7 +68,7 @@ func Try(args []string) bool {
 	return false
 }
 
-// 分析字符串中的参数
+// ParseArgs 分析字符串中的参数
 func ParseArgs(s string) (args []string) {
 	quotesBegin := false
 	quotesEscaped := false
@@ -93,7 +93,7 @@ func ParseArgs(s string) (args []string) {
 				lastQuote = character
 			}
 		} else if character == '\\' {
-			if len(s) > index+1 && (s[index+1:index+2][0] == '"' || s[index+1:index+2][0] == '\'') {
+			if len(s) > index+1 && (s[index+1 : index+2][0] == '"' || s[index+1 : index+2][0] == '\'') {
 				quotesEscaped = true
 			} else {
 				lastArg += string(character)

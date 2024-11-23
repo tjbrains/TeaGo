@@ -14,7 +14,7 @@ const (
 	CacheOperationDelete = "delete"
 )
 
-// 缓存管理器
+// Factory 缓存管理器
 type Factory struct {
 	items       map[string]*Item
 	maxSize     int64                               // @TODO 实现maxSize
@@ -23,26 +23,26 @@ type Factory struct {
 	looper      *timers.Looper
 }
 
-// 创建一个新的缓存管理器
+// NewFactory 创建一个新的缓存管理器
 func NewFactory() *Factory {
-	return newFactoryInterval(30 * time.Second)
+	return NewFactoryInterval(30 * time.Second)
 }
 
-func newFactoryInterval(duration time.Duration) *Factory {
+func NewFactoryInterval(duration time.Duration) *Factory {
 	factory := &Factory{
 		items:  map[string]*Item{},
 		locker: &sync.Mutex{},
 	}
 
 	factory.looper = timers.Loop(duration, func(looper *timers.Looper) {
-		factory.clean()
+		factory.Clean()
 	})
 
 	return factory
 }
 
-// 设置缓存
-func (this *Factory) Set(key string, value interface{}, duration ...time.Duration) *Item {
+// Set 设置缓存
+func (this *Factory) Set(key string, value any, duration ...time.Duration) *Item {
 	item := new(Item)
 	item.Key = key
 	item.Value = value
@@ -70,8 +70,8 @@ func (this *Factory) Set(key string, value interface{}, duration ...time.Duratio
 	return item
 }
 
-// 获取缓存
-func (this *Factory) Get(key string) (value interface{}, found bool) {
+// Get 获取缓存
+func (this *Factory) Get(key string) (value any, found bool) {
 	this.locker.Lock()
 	defer this.locker.Unlock()
 
@@ -87,13 +87,13 @@ func (this *Factory) Get(key string) (value interface{}, found bool) {
 	return item.Value, true
 }
 
-// 判断是否有缓存
+// Has 判断是否有缓存
 func (this *Factory) Has(key string) bool {
 	_, found := this.Get(key)
 	return found
 }
 
-// 删除缓存
+// Delete 删除缓存
 func (this *Factory) Delete(key string) {
 
 	this.locker.Lock()
@@ -107,12 +107,12 @@ func (this *Factory) Delete(key string) {
 	this.locker.Unlock()
 }
 
-// 设置操作回调
+// OnOperation 设置操作回调
 func (this *Factory) OnOperation(f func(op CacheOperation, item *Item)) {
 	this.onOperation = f
 }
 
-// 关闭
+// Close 关闭
 func (this *Factory) Close() {
 	this.locker.Lock()
 	defer this.locker.Unlock()
@@ -125,15 +125,22 @@ func (this *Factory) Close() {
 	this.items = map[string]*Item{}
 }
 
-// 重置状态
+// Reset 重置状态
 func (this *Factory) Reset() {
 	this.locker.Lock()
 	defer this.locker.Unlock()
 	this.items = map[string]*Item{}
 }
 
-// 清理过期的缓存
-func (this *Factory) clean() {
+// Items 读取所有条目
+func (this *Factory) Items() map[string]*Item {
+	this.locker.Lock()
+	defer this.locker.Unlock()
+	return this.items
+}
+
+// Clean 清理过期的缓存
+func (this *Factory) Clean() {
 	this.locker.Lock()
 	defer this.locker.Unlock()
 

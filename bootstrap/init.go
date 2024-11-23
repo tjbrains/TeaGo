@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	webIsSet := false
+	var webIsSet = false
 	if !Tea.IsTesting() {
 		exePath, err := os.Executable()
 		if err != nil {
@@ -43,7 +43,7 @@ func init() {
 }
 
 func lookupModRoot(pwd string) string {
-	f := pwd + Tea.DS + "go.mod"
+	var f = pwd + Tea.DS + "go.mod"
 	_, err := os.Stat(f)
 	if err != nil {
 		parent := filepath.Dir(pwd)

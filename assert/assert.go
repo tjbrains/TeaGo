@@ -43,7 +43,7 @@ func (this *Assertion) Quiet(isQuiet ...bool) *Assertion {
 }
 
 // IsTrue 检查是否为true
-func (this *Assertion) IsTrue(value bool, msg ...interface{}) *Assertion {
+func (this *Assertion) IsTrue(value bool, msg ...any) *Assertion {
 	if value {
 		this.Pass(msg...)
 	} else {
@@ -54,7 +54,7 @@ func (this *Assertion) IsTrue(value bool, msg ...interface{}) *Assertion {
 }
 
 // IsFalse 检查是否为false
-func (this *Assertion) IsFalse(value bool, msg ...interface{}) *Assertion {
+func (this *Assertion) IsFalse(value bool, msg ...any) *Assertion {
 	if !value {
 		this.Pass(msg...)
 	} else {
@@ -65,7 +65,7 @@ func (this *Assertion) IsFalse(value bool, msg ...interface{}) *Assertion {
 }
 
 // IsNil 检查是否为nil
-func (this *Assertion) IsNil(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsNil(value any, msg ...any) *Assertion {
 	if value == nil || reflect.ValueOf(value).IsNil() {
 		this.Pass(msg...)
 	} else {
@@ -76,7 +76,7 @@ func (this *Assertion) IsNil(value interface{}, msg ...interface{}) *Assertion {
 }
 
 // IsNotNil 检查是否为非nil
-func (this *Assertion) IsNotNil(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsNotNil(value any, msg ...any) *Assertion {
 	if value != nil && !reflect.ValueOf(value).IsNil() {
 		this.Pass(msg...)
 	} else {
@@ -87,7 +87,7 @@ func (this *Assertion) IsNotNil(value interface{}, msg ...interface{}) *Assertio
 }
 
 // IsNotError 检查是否为非error
-func (this *Assertion) IsNotError(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsNotError(value any, msg ...any) *Assertion {
 	if value == nil {
 		this.Pass(msg...)
 		return this
@@ -104,7 +104,7 @@ func (this *Assertion) IsNotError(value interface{}, msg ...interface{}) *Assert
 }
 
 // IsNotEmpty 检查是否为非空
-func (this *Assertion) IsNotEmpty(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsNotEmpty(value any, msg ...any) *Assertion {
 	if value == nil {
 		this.Fail(msg...)
 		return this
@@ -136,7 +136,7 @@ func (this *Assertion) IsNotEmpty(value interface{}, msg ...interface{}) *Assert
 }
 
 // IsNumber 检查是否为数字
-func (this *Assertion) IsNumber(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsNumber(value any, msg ...any) *Assertion {
 	if types.IsNumber(value) {
 		this.Pass(msg...)
 	} else {
@@ -215,7 +215,7 @@ func (this *Assertion) Contains(container interface{}, item interface{}, msg ...
 }
 
 // Match 执行正则匹配
-func (this *Assertion) Match(pattern string, value string, msg ...interface{}) *Assertion {
+func (this *Assertion) Match(pattern string, value string, msg ...any) *Assertion {
 	reg, err := regexp.Compile(pattern)
 	if err != nil {
 		this.Fail(err.Error())
@@ -228,7 +228,7 @@ func (this *Assertion) Match(pattern string, value string, msg ...interface{}) *
 }
 
 // IsKind 检查类型
-func (this *Assertion) IsKind(value interface{}, kind reflect.Kind, msg ...interface{}) *Assertion {
+func (this *Assertion) IsKind(value interface{}, kind reflect.Kind, msg ...any) *Assertion {
 	v := reflect.TypeOf(value)
 	if v == nil {
 		this.Fail(msg...)
@@ -245,72 +245,72 @@ func (this *Assertion) IsKind(value interface{}, kind reflect.Kind, msg ...inter
 }
 
 // IsBool 检查是否为bool类型
-func (this *Assertion) IsBool(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsBool(value interface{}, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Bool, msg...)
 }
 
 // IsInt 检查是否为int类型
-func (this *Assertion) IsInt(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsInt(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Int, msg...)
 }
 
 // IsInt8 检查是否为int8类型
-func (this *Assertion) IsInt8(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsInt8(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Int8, msg...)
 }
 
 // IsInt16 检查是否为int16类型
-func (this *Assertion) IsInt16(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsInt16(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Int16, msg...)
 }
 
 // IsInt32 检查是否为int32类型
-func (this *Assertion) IsInt32(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsInt32(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Int32, msg...)
 }
 
 // IsInt64 检查是否为int64类型
-func (this *Assertion) IsInt64(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsInt64(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Int64, msg...)
 }
 
 // IsUint 检查是否为uint类型
-func (this *Assertion) IsUint(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsUint(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Uint, msg...)
 }
 
 // IsUint8 检查是否为uint8类型
-func (this *Assertion) IsUint8(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsUint8(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Uint8, msg...)
 }
 
 // IsUint16 检查是否为uint16类型
-func (this *Assertion) IsUint16(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsUint16(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Uint16, msg...)
 }
 
 // IsUint32 检查是否为uint32类型
-func (this *Assertion) IsUint32(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsUint32(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Uint32, msg...)
 }
 
 // IsUint64 检查是否为uint64类型
-func (this *Assertion) IsUint64(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsUint64(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Uint64, msg...)
 }
 
 // IsFloat32 检查是否为float32类型
-func (this *Assertion) IsFloat32(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsFloat32(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Float32, msg...)
 }
 
 // IsFloat64 检查是否为float64类型
-func (this *Assertion) IsFloat64(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsFloat64(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Float64, msg...)
 }
 
 // IsInteger 检查是否为整数类型（int, int8, ...）
-func (this *Assertion) IsInteger(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsInteger(value any, msg ...any) *Assertion {
 	if types.IsInteger(value) {
 		this.Pass(msg...)
 	} else {
@@ -321,7 +321,7 @@ func (this *Assertion) IsInteger(value interface{}, msg ...interface{}) *Asserti
 }
 
 // IsFloat 检查是否为浮点数类型（float32, float64）
-func (this *Assertion) IsFloat(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsFloat(value any, msg ...any) *Assertion {
 	if types.IsFloat(value) {
 		this.Pass(msg...)
 	} else {
@@ -332,7 +332,7 @@ func (this *Assertion) IsFloat(value interface{}, msg ...interface{}) *Assertion
 }
 
 // Gt 检查是否大于某个数字
-func (this *Assertion) Gt(value interface{}, compare interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) Gt(value any, compare any, msg ...any) *Assertion {
 	if !types.IsNumber(value) {
 		this.Fail("'value' should be a number")
 		return this
@@ -354,7 +354,7 @@ func (this *Assertion) Gt(value interface{}, compare interface{}, msg ...interfa
 }
 
 // Gte 检查是否大于等于某个数字
-func (this *Assertion) Gte(value interface{}, compare interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) Gte(value any, compare any, msg ...any) *Assertion {
 	if !types.IsNumber(value) {
 		this.Fail("'value' should be a number")
 		return this
@@ -376,7 +376,7 @@ func (this *Assertion) Gte(value interface{}, compare interface{}, msg ...interf
 }
 
 // Lt 检查是否小于某个数字
-func (this *Assertion) Lt(value interface{}, compare interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) Lt(value any, compare any, msg ...any) *Assertion {
 	if !types.IsNumber(value) {
 		this.Fail("'value' should be a number")
 		return this
@@ -398,7 +398,7 @@ func (this *Assertion) Lt(value interface{}, compare interface{}, msg ...interfa
 }
 
 // Lte 检查是否小于等于某个数字
-func (this *Assertion) Lte(value interface{}, compare interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) Lte(value any, compare any, msg ...any) *Assertion {
 	if !types.IsNumber(value) {
 		this.Fail("'value' should be a number")
 		return this
@@ -420,7 +420,7 @@ func (this *Assertion) Lte(value interface{}, compare interface{}, msg ...interf
 }
 
 // Between 检查是否在两个数字之间
-func (this *Assertion) Between(value interface{}, min interface{}, max interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) Between(value any, min any, max any, msg ...any) *Assertion {
 	if !types.IsNumber(value) {
 		this.Fail("'value' should be a number")
 		return this
@@ -454,7 +454,7 @@ func (this *Assertion) Between(value interface{}, min interface{}, max interface
 }
 
 // IsString 检查是否为字符串
-func (this *Assertion) IsString(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsString(value any, msg ...any) *Assertion {
 	_, ok := value.(string)
 	if ok {
 		this.Pass(msg...)
@@ -465,7 +465,7 @@ func (this *Assertion) IsString(value interface{}, msg ...interface{}) *Assertio
 }
 
 // IsMap 检查是否为map
-func (this *Assertion) IsMap(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsMap(value any, msg ...any) *Assertion {
 	if value == nil {
 		this.Fail(msg...)
 		return this
@@ -481,7 +481,7 @@ func (this *Assertion) IsMap(value interface{}, msg ...interface{}) *Assertion {
 }
 
 // IsSlice 检查是否为slice
-func (this *Assertion) IsSlice(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsSlice(value any, msg ...any) *Assertion {
 	if value == nil {
 		this.Fail(msg...)
 		return this
@@ -505,7 +505,7 @@ func (this *Assertion) Then(f func()) *Assertion {
 }
 
 // Panic 检查是否有panic
-func (this *Assertion) Panic(f func(), msg ...interface{}) *Assertion {
+func (this *Assertion) Panic(f func(), msg ...any) *Assertion {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -520,7 +520,7 @@ func (this *Assertion) Panic(f func(), msg ...interface{}) *Assertion {
 }
 
 // NoPanic 检查是否没有panic
-func (this *Assertion) NoPanic(f func(), msg ...interface{}) *Assertion {
+func (this *Assertion) NoPanic(f func(), msg ...any) *Assertion {
 	defer func() {
 		err := recover()
 		if err == nil {
@@ -535,13 +535,13 @@ func (this *Assertion) NoPanic(f func(), msg ...interface{}) *Assertion {
 }
 
 // NotTimeout 检查执行时间是否超时
-func (this *Assertion) NotTimeout(duration time.Duration, f func(), msg ...interface{}) *Assertion {
+func (this *Assertion) NotTimeout(duration time.Duration, f func(), msg ...any) *Assertion {
 	before := time.Now()
 	f()
 	cost := time.Since(before)
 
 	if len(msg) == 0 {
-		msg = []interface{}{fmt.Sprintf("cost:%.6f seconds", cost.Seconds())}
+		msg = []any{fmt.Sprintf("cost:%.6f seconds", cost.Seconds())}
 	}
 
 	if cost > duration {
@@ -553,21 +553,21 @@ func (this *Assertion) NotTimeout(duration time.Duration, f func(), msg ...inter
 }
 
 // Log 输出日志
-func (this *Assertion) Log(msg ...interface{}) *Assertion {
+func (this *Assertion) Log(msg ...any) *Assertion {
 	this.output("", msg...)
 
 	return this
 }
 
 // Logf 格式化输出日志
-func (this *Assertion) Logf(format string, args ...interface{}) *Assertion {
+func (this *Assertion) Logf(format string, args ...any) *Assertion {
 	this.Log(fmt.Sprintf(format, args...))
 
 	return this
 }
 
 // LogJSON 输出JSON格式的日志
-func (this *Assertion) LogJSON(msg ...interface{}) *Assertion {
+func (this *Assertion) LogJSON(msg ...any) *Assertion {
 	for _, m := range msg {
 		this.t.Log(stringutil.JSONEncodePretty(m))
 	}
@@ -575,21 +575,21 @@ func (this *Assertion) LogJSON(msg ...interface{}) *Assertion {
 }
 
 // Fail 返回失败
-func (this *Assertion) Fail(msg ...interface{}) *Assertion {
+func (this *Assertion) Fail(msg ...any) *Assertion {
 	this.output("[FAIL]", msg...)
 	this.isPassed = false
 	return this
 }
 
 // Fatal 返回致命错误
-func (this *Assertion) Fatal(msg ...interface{}) *Assertion {
+func (this *Assertion) Fatal(msg ...any) *Assertion {
 	this.output("[FATAL]", msg...)
 	this.isPassed = false
 	return this
 }
 
 // Pass 返回成功
-func (this *Assertion) Pass(msg ...interface{}) *Assertion {
+func (this *Assertion) Pass(msg ...any) *Assertion {
 	this.output("[PASS]", msg...)
 	this.isPassed = true
 	return this
@@ -601,7 +601,7 @@ func (this *Assertion) Cost() *Assertion {
 	return this
 }
 
-func (this *Assertion) output(tag string, msg ...interface{}) *Assertion {
+func (this *Assertion) output(tag string, msg ...any) *Assertion {
 	var filename string
 	var lineNo int
 
@@ -664,14 +664,14 @@ func (this *Assertion) output(tag string, msg ...interface{}) *Assertion {
 			output += "| " + source + "\n"
 		}
 		output += "| " + filename + ":" + fmt.Sprintf("%d", lineNo)
-		msg = []interface{}{output}
+		msg = []any{output}
 	} else {
 		output := tag + "\n"
 		if len(source) > 0 {
 			output += "| " + source + "\n"
 		}
 		output += "| " + filename + ":" + fmt.Sprintf("%d", lineNo)
-		msg = []interface{}{output}
+		msg = []any{output}
 	}
 
 	if tag == "[PASS]" {

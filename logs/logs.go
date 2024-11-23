@@ -61,15 +61,15 @@ func HasWriter() bool {
 	return writer != nil
 }
 
-func Println(args ...interface{}) {
+func Println(args ...any) {
 	if !isOn {
 		return
 	}
 
 	if writer != nil {
 		// 给args中间加入空格
-		newArgs := []interface{}{}
-		countArgs := len(args)
+		var newArgs = []any{}
+		var countArgs = len(args)
 		for index, arg := range args {
 			if index < countArgs-1 {
 				newArgs = append(newArgs, arg, " ")
@@ -83,7 +83,7 @@ func Println(args ...interface{}) {
 	}
 }
 
-func Printf(format string, args ...interface{}) {
+func Printf(format string, args ...any) {
 	if !isOn {
 		return
 	}
@@ -95,7 +95,7 @@ func Printf(format string, args ...interface{}) {
 	}
 }
 
-func Sprintf(format string, args ...interface{}) string {
+func Sprintf(format string, args ...any) string {
 	{
 		reg, _ := stringutil.RegexpCompile("<(\\w+)>")
 		format = reg.ReplaceAllStringFunc(format, func(value string) string {
@@ -128,27 +128,27 @@ func Sprintf(format string, args ...interface{}) string {
 	return fmt.Sprintf(format, args...)
 }
 
-func Infof(format string, args ...interface{}) {
+func Infof(format string, args ...any) {
 	Printf("[INFO]"+format, args...)
 }
 
-func Codef(format string, args ...interface{}) {
+func Codef(format string, args ...any) {
 	Printf("[CODE]<code>"+format+"</code>", args...)
 }
 
-func Debugf(format string, args ...interface{}) {
+func Debugf(format string, args ...any) {
 	Printf("[DEBUG]<code>"+format+"</code>", args...)
 }
 
-func Successf(format string, args ...interface{}) {
+func Successf(format string, args ...any) {
 	Printf("[SUCCESS]<success>"+format+"</success>", args...)
 }
 
-func Warnf(format string, args ...interface{}) {
+func Warnf(format string, args ...any) {
 	Printf("[WARN]<warn>"+format+"</warn>", args...)
 }
 
-func Errorf(format string, args ...interface{}) {
+func Errorf(format string, args ...any) {
 	errorString := fmt.Sprintf(format, args...)
 
 	// 调用stack
@@ -193,7 +193,7 @@ func Error(err error) {
 	Errorf("%s", errorString)
 }
 
-func Fatalf(format string, args ...interface{}) {
+func Fatalf(format string, args ...any) {
 	Printf("[FATAL]<error>"+format+"</error>", args...)
 	os.Exit(0)
 }
@@ -203,7 +203,7 @@ func Fatal(err error) {
 	os.Exit(0)
 }
 
-func Dump(variable interface{}) {
+func Dump(variable any) {
 	var s = fmt.Sprintf("%#v", variable)
 	var buffer = bytes.Buffer{}
 	var indent = 0
@@ -251,7 +251,7 @@ func Dump(variable interface{}) {
 	Printf("<code>%s</code>", buffer.String())
 }
 
-func PrintAsJSON(value interface{}, t ...*testing.T) {
+func PrintAsJSON(value any, t ...*testing.T) {
 	data, err := json.MarshalIndent(value, "", "   ")
 	if err != nil {
 		Error(err)

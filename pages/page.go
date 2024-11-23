@@ -11,7 +11,7 @@ type Page struct {
 }
 
 func NewPage(total int, size int, index int) *Page {
-	page := &Page{
+	var page = &Page{
 		Total: total,
 		Size:  size,
 		Index: index,

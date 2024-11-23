@@ -117,13 +117,13 @@ func (this *File) AbsPath() (string, error) {
 	return p, nil
 }
 
-// Md5 对文件内容进行Md5处理
-func (this *File) Md5() (string, error) {
+// MD5 对文件内容进行Md5处理
+func (this *File) MD5() (string, error) {
 	data, err := os.ReadFile(this.path)
 	if err != nil {
 		return "", err
 	}
-	return stringutil.Md5(string(data)), err
+	return stringutil.MD5(string(data)), err
 }
 
 // ReadAll 读取文件内容

@@ -1,8 +1,9 @@
-package logs
+package logs_test
 
 import (
-	"testing"
 	"errors"
+	"github.com/tjbrains/TeaGo/logs"
+	"testing"
 )
 
 func TestDump(t *testing.T) {
@@ -14,9 +15,9 @@ func TestDump(t *testing.T) {
 			"price": 20.00,
 		},
 	}
-	Dump(m)
+	logs.Dump(m)
 }
 
 func TestError(t *testing.T) {
-	Error(errors.New("This is error!!!"))
+	logs.Error(errors.New("This is error!!!"))
 }

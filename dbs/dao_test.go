@@ -1,28 +1,29 @@
-package dbs
+package dbs_test
 
 import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/tjbrains/TeaGo/bootstrap"
+	"github.com/tjbrains/TeaGo/dbs"
 	"github.com/tjbrains/TeaGo/maps"
 	"log"
 	"testing"
 	"time"
 )
 
-type UserDAO DAO
+type UserDAO dbs.DAO
 
 type User struct {
-	Id         int    `field:"id"`
-	Gender     int    `field:"gender"`
-	Birthday   string `field:"birthday"`
-	Name       string `field:"name"`
-	CreatedAt  int    `field:"created_at"`
-	UpdatedAt  int    `field:"updated_at"`
-	State      int    `field:"state"`
-	IsShop     bool   `field:"is_shop"`
-	CountViews int    `field:"count_views"`
-	Books      JSON   `field:"books"`
+	Id         int      `field:"id"`
+	Gender     int      `field:"gender"`
+	Birthday   string   `field:"birthday"`
+	Name       string   `field:"name"`
+	CreatedAt  int      `field:"created_at"`
+	UpdatedAt  int      `field:"updated_at"`
+	State      int      `field:"state"`
+	IsShop     bool     `field:"is_shop"`
+	CountViews int      `field:"count_views"`
+	Books      dbs.JSON `field:"books"`
 }
 
 type UserOperator struct {
@@ -39,8 +40,8 @@ type UserOperator struct {
 }
 
 func NewUserDAO() *UserDAO {
-	return NewDAO(&UserDAO{
-		DAOObject{
+	return dbs.NewDAO(&UserDAO{
+		dbs.DAOObject{
 			DB:     "dev",
 			Table:  "pp_users",
 			Model:  new(User),
@@ -147,7 +148,7 @@ func TestDaoSaveEmpty(t *testing.T) {
 	var user = new(UserOperator)
 	t.Log(user)
 	user.Id = 1
-	user.Name = FuncRand()
+	user.Name = dbs.FuncRand()
 	t.Log(user)
 	t.Log("user.Name == nil", user.Name == nil)
 	t.Log("user.Age == nil", user.Age == nil)
@@ -166,14 +167,14 @@ func TestDaoSave2(t *testing.T) {
 }
 
 func TestDAOObject_NotifyInsert(t *testing.T) {
-	dao := &DAOObject{}
+	var dao = &dbs.DAOObject{}
 	dao.OnInsert(func() error {
 		t.Log("func1")
 		return nil
 	})
 	dao.OnInsert(func() error {
 		t.Log("func2")
-		return ErrNotFound
+		return dbs.ErrNotFound
 	})
 	dao.OnInsert(func() error {
 		t.Log("func3")

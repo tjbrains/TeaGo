@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// 延时执行函数，不阻塞当前进程
+// Delay 延时执行函数，不阻塞当前进程
 func Delay(duration time.Duration, task func(timer *time.Timer)) *time.Timer {
 	timer := time.NewTimer(duration)
 	go func() {
@@ -16,7 +16,7 @@ func Delay(duration time.Duration, task func(timer *time.Timer)) *time.Timer {
 	return timer
 }
 
-// 在某个时间点执行函数，不阻塞当前进程
+// At 在某个时间点执行函数，不阻塞当前进程
 func At(atTime time.Time, task func(timer *time.Timer)) *time.Timer {
 	timer := time.NewTimer(-time.Since(atTime))
 	go func() {
@@ -39,7 +39,7 @@ func Every(duration time.Duration, task func(ticker *time.Ticker)) *time.Ticker 
 	return ticker
 }
 
-// 循环执行某个函数，并保持每次执行之间的间隔
+// Loop 循环执行某个函数，并保持每次执行之间的间隔
 func Loop(duration time.Duration, task func(looper *Looper)) *Looper {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)

@@ -1,14 +1,15 @@
-package files
+package files_test
 
 import (
-	"testing"
 	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/files"
 	"os"
 	"syscall"
+	"testing"
 )
 
 func TestFile_Stat(t *testing.T) {
-	file := NewFile(Tea.TmpFile("test.txt"))
+	var file = files.NewFile(Tea.TmpFile("test.txt"))
 	stat, err := file.Stat()
 	if err != nil {
 		t.Fatal(err)
@@ -21,27 +22,27 @@ func TestFile_Stat(t *testing.T) {
 }
 
 func TestFile_IsFile(t *testing.T) {
-	file := NewFile("file.go")
+	var file = files.NewFile("file.go")
 	t.Log(file.Exists())
 	t.Log(file.IsFile())
 	t.Log(file.IsDir())
 }
 
 func TestFile_Read(t *testing.T) {
-	file := NewFile("file.go")
+	var file = files.NewFile("file.go")
 	t.Log(file.ReadAll())
 	//t.Log(file.ReadAllAsString())
-	t.Log(file.Md5())
+	t.Log(file.MD5())
 	t.Log(file.Ext())
 }
 
 func TestFile_MkdirAll(t *testing.T) {
-	file := NewFile(Tea.Root + "/tmp/a/b/c")
+	var file = files.NewFile(Tea.Root + "/tmp/a/b/c")
 	t.Log(file.MkdirAll())
 }
 
 func TestFile_Delete(t *testing.T) {
-	file := NewFile(Tea.TmpFile("test.txt"))
+	var file = files.NewFile(Tea.TmpFile("test.txt"))
 	t.Log(file.Delete())
 	if file.Exists() {
 		t.Fatal("[ERROR]", "delete failed")
@@ -49,7 +50,7 @@ func TestFile_Delete(t *testing.T) {
 }
 
 func TestFile_DeleteDir(t *testing.T) {
-	file := NewFile(Tea.TmpFile("test"))
+	var file = files.NewFile(Tea.TmpFile("test"))
 	t.Log(file.DeleteAll())
 	if file.Exists() {
 		t.Fatal("[ERROR]", "delete failed")
@@ -57,7 +58,7 @@ func TestFile_DeleteDir(t *testing.T) {
 }
 
 func TestFile_List(t *testing.T) {
-	result := NewFile("../").List()
+	var result = files.NewFile("../").List()
 	for _, file := range result {
 		absPath, _ := file.AbsPath()
 		t.Log(file.Name(), file.IsFile(), absPath)
@@ -65,12 +66,12 @@ func TestFile_List(t *testing.T) {
 }
 
 func TestFile_Create(t *testing.T) {
-	file := NewFile(Tea.TmpFile("test.tmp"))
+	var file = files.NewFile(Tea.TmpFile("test.tmp"))
 	t.Log(file.Create())
 }
 
 func TestFile_Touch(t *testing.T) {
-	file := NewFile(Tea.TmpFile("test.txt"))
+	var file = files.NewFile(Tea.TmpFile("test.txt"))
 	err := file.Touch()
 	if err != nil {
 		t.Fatal(err)
@@ -79,19 +80,22 @@ func TestFile_Touch(t *testing.T) {
 }
 
 func TestFile_Append(t *testing.T) {
-	file := NewFile(Tea.TmpFile("test.txt"))
-	file.Append([]byte("\n"))
+	var file = files.NewFile(Tea.TmpFile("test.txt"))
+	err := file.Append([]byte("\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Log(file.AppendString("aaaa"))
 }
 
 func TestFile_Write(t *testing.T) {
-	file := NewFile(Tea.TmpFile("test.txt"))
+	var file = files.NewFile(Tea.TmpFile("test.txt"))
 	t.Log(file.WriteString("aaaa"))
 }
 
 func TestFile_Range(t *testing.T) {
-	dir := NewFile("../../")
-	dir.Range(func(file *File) {
+	var dir = files.NewFile("../../")
+	dir.Range(func(file *files.File) {
 		t.Log(file.Path())
 	})
 }

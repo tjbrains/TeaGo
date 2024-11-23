@@ -56,7 +56,7 @@ func (this *Command) ErrorString(err string) {
 	this.Output("<error>"+err+"</error>", "\n")
 }
 
-// 获取参数值
+// Param 获取参数值
 func (this *Command) Param(key string) (value string, found bool) {
 	if len(key) == 0 {
 		return "", false
@@ -74,7 +74,7 @@ func (this *Command) Param(key string) (value string, found bool) {
 	return "", false
 }
 
-// 判断是否含有某参数
+// HasParam 判断是否含有某参数
 func (this *Command) HasParam(key string) bool {
 	_, found := this.Param(key)
 	return found

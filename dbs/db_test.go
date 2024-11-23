@@ -1,7 +1,8 @@
-package dbs
+package dbs_test
 
 import (
 	"encoding/json"
+	"github.com/tjbrains/TeaGo/dbs"
 	"github.com/tjbrains/TeaGo/logs"
 	"log"
 	"testing"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestDBName(t *testing.T) {
-	db, err := Instance("db2")
+	db, err := dbs.Instance("db2")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -18,7 +19,7 @@ func TestDBName(t *testing.T) {
 }
 
 func TestDBFindTable(t *testing.T) {
-	db, err := Instance("dev")
+	db, err := dbs.Instance("dev")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,7 +33,7 @@ func TestDBFindTable(t *testing.T) {
 }
 
 func TestDB_FindFullTable(t *testing.T) {
-	db, err := Instance("dev")
+	db, err := dbs.Instance("dev")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,7 +51,7 @@ func TestDB_FindFullTable(t *testing.T) {
 }
 
 func TestDB_FindFunctions(t *testing.T) {
-	db, err := Instance("dev")
+	db, err := dbs.Instance("dev")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -66,7 +67,7 @@ func TestDB_FindFunctions(t *testing.T) {
 }
 
 func TestDBTableNames(t *testing.T) {
-	db, err := Instance("db1")
+	db, err := dbs.Instance("db1")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,7 +76,7 @@ func TestDBTableNames(t *testing.T) {
 }
 
 func TestDB_FindPreparedOnes(t *testing.T) {
-	db, err := NewInstanceFromConfig(&DBConfig{
+	db, err := dbs.NewInstanceFromConfig(&dbs.DBConfig{
 		Driver: "mysql",
 		Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_cloud?charset=utf8mb4&timeout=30s",
 		Prefix: "cloud",
@@ -105,7 +106,7 @@ func TestDB_FindPreparedOnes(t *testing.T) {
 }
 
 func TestDB_FindOnes(t *testing.T) {
-	db, err := Default()
+	db, err := dbs.Default()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -120,7 +121,7 @@ func TestDB_FindOnes(t *testing.T) {
 }
 
 func TestDB_FindOne(t *testing.T) {
-	db, err := Default()
+	db, err := dbs.Default()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,7 +135,7 @@ func TestDB_FindOne(t *testing.T) {
 }
 
 func TestDB_FindCol(t *testing.T) {
-	db, err := Default()
+	db, err := dbs.Default()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -148,7 +149,7 @@ func TestDB_FindCol(t *testing.T) {
 }
 
 func TestDB_FindCol_Empty(t *testing.T) {
-	db, err := Default()
+	db, err := dbs.Default()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -165,7 +166,7 @@ func TestDB_FindCol_Empty(t *testing.T) {
 }
 
 func TestDB_MultipleStatements(t *testing.T) {
-	db, err := Default()
+	db, err := dbs.Default()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,7 +182,7 @@ func TestDB_MultipleStatements(t *testing.T) {
 }
 
 func BenchmarkDB_FindOne(b *testing.B) {
-	db, err := Default()
+	db, err := dbs.Default()
 	if err != nil {
 		b.Fatal(err)
 	}

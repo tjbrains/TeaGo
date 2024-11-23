@@ -52,8 +52,8 @@ var md5Pool = &sync.Pool{
 	},
 }
 
-// Md5 计算字符串的md5
-func Md5(source string) string {
+// MD5 计算字符串的md5
+func MD5(source string) string {
 	var m = md5Pool.Get().(hash.Hash)
 	m.Write([]byte(source))
 	var result = hex.EncodeToString(m.Sum(nil))
@@ -198,7 +198,7 @@ func VersionCompare(version1 string, version2 string) int8 {
 }
 
 // JSONEncode JSON Encode
-func JSONEncode(v interface{}) string {
+func JSONEncode(v any) string {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return "null"
@@ -207,7 +207,7 @@ func JSONEncode(v interface{}) string {
 }
 
 // JSONEncodePretty JSON Encode Pretty
-func JSONEncodePretty(v interface{}) string {
+func JSONEncodePretty(v any) string {
 	b, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
 		return "null"

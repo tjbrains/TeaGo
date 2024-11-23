@@ -1,9 +1,10 @@
-package dbs
+package dbs_test
 
 import (
 	"encoding/json"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/tjbrains/TeaGo/assert"
+	"github.com/tjbrains/TeaGo/dbs"
 	"github.com/tjbrains/TeaGo/logs"
 	"github.com/tjbrains/TeaGo/types"
 	stringutil "github.com/tjbrains/TeaGo/utils/string"
@@ -31,24 +32,24 @@ type TestDb struct {
 	State   uint8  `field:"state"`
 }
 
-type TestDbDAO DAO
+type TestDbDAO dbs.DAO
 
 func (user *TestUser) CreatedDate() string {
 	return timeutil.Format("Y-m-d H:i:s", time.Unix(user.CreatedAt, 0))
 }
 
 func TestQueryString(t *testing.T) {
-	var query = Query{}
-	t.Log(query.stringValue(1))
-	t.Log(query.stringValue(1.2))
-	t.Log(query.stringValue("hello"))
-	t.Log(query.stringValue(false), query.stringValue(true))
-	t.Log(query.stringValue([]byte("Hello")))
-	t.Log(query.stringValue(nil))
+	var query = dbs.Query{}
+	t.Log(query.FormatScalar(1))
+	t.Log(query.FormatScalar(1.2))
+	t.Log(query.FormatScalar("hello"))
+	t.Log(query.FormatScalar(false), query.FormatScalar(true))
+	t.Log(query.FormatScalar([]byte("Hello")))
+	t.Log(query.FormatScalar(nil))
 }
 
 func TestQuerySQL(t *testing.T) {
-	var sql = SQL("SELECT id FROM users")
+	var sql = dbs.SQL("SELECT id FROM users")
 	t.Log("String:", sql, "Type:", reflect.ValueOf(sql).Type().Name())
 }
 
@@ -65,10 +66,10 @@ func TestQuery_AsSQL(t *testing.T) {
 		t.Log(time.Since(before).Seconds()*1000, "ms")
 	}()
 
-	var query = NewQuery(nil)
+	var query = dbs.NewQuery(nil)
 	query.Table("users")
-	query.DB(&DB{})
-	query.action = QueryActionFind
+	query.DB(&dbs.DB{})
+	query.Action(dbs.QueryActionFind)
 
 	query.Where("name=:name AND age=:age").
 		Where("created_at>0")
@@ -85,34 +86,34 @@ func TestQuery_AsSQL(t *testing.T) {
 	query.Limit(10)
 	//query.Debug(false)
 
-	t.Logf("Attrs:%#v\n", query.attrs)
-	t.Logf("NamedParams:%#v\n", query.namedParams)
+	t.Logf("Attrs:%#v\n", query.TestAttrs())
+	t.Logf("NamedParams:%#v\n", query.TestNameParams())
 
 	sql, err := query.AsSQL()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	t.Logf("Params:%#v\n", query.params)
+	t.Logf("Params:%#v\n", query.TestParams())
 
 	t.Log(sql)
-	t.Logf("sum: %s", stringutil.Md5(sql))
+	t.Logf("sum: %s", stringutil.MD5(sql))
 }
 
 func TestQuery_AsSQL_Cache(t *testing.T) {
-	var query = NewQuery(nil)
+	var query = dbs.NewQuery(nil)
 	query.Table("users")
-	query.DB(&DB{})
-	query.action = QueryActionFind
+	query.DB(&dbs.DB{})
+	query.Action(dbs.QueryActionFind)
 	t.Log(query.AsSQL())
 }
 
 func TestQuery_AsSQL_Many(t *testing.T) {
 	for i := 0; i < 20; i++ {
-		var query = NewQuery(nil)
+		var query = dbs.NewQuery(nil)
 		query.Table("users_" + types.String(i))
-		query.DB(&DB{})
-		query.action = QueryActionFind
+		query.DB(&dbs.DB{})
+		query.Action(dbs.QueryActionFind)
 
 		query.Where("name=:name AND age=:age").
 			Where("created_at>0")
@@ -177,7 +178,7 @@ func TestQuery_FindOnes(t *testing.T) {
 	//query.Group("state", QUERY_ORDER_DESC)
 	//query.Having("state>0")
 
-	query.action = QueryActionFind
+	query.Action(dbs.QueryActionFind)
 	query.Debug(false)
 	//t.Log(query.AsSQL())
 	//return
@@ -389,16 +390,16 @@ func TestQueryInsertOrUpdate(t *testing.T) {
 	var updating = map[string]any{
 		"name":        "李白2",
 		"mobile":      "138",
-		"version":     SQL("version+1"),
-		"count_views": SQL("RAND() * 10000"),
+		"version":     dbs.SQL("version+1"),
+		"count_views": dbs.SQL("RAND() * 10000"),
 	}
 	t.Log(query.InsertOrUpdate(inserting, updating))
 }
 
 func TestQueryJoin(t *testing.T) {
 	var query = setupUserQuery()
-	var dao = NewDAO(&TestDbDAO{
-		DAOObject: DAOObject{
+	var dao = dbs.NewDAO(&TestDbDAO{
+		DAOObject: dbs.DAOObject{
 			DB:     "db1",
 			Table:  "pp_dbs",
 			Model:  new(TestDb),
@@ -409,7 +410,7 @@ func TestQueryJoin(t *testing.T) {
 	now := time.Now()
 
 	query.Result("self.id, self.createdAt,TestDb.name AS dbName")
-	query.Join(dao, QueryJoinRight, "TestUser.id=TestDb.userId")
+	query.Join(dao, dbs.QueryJoinRight, "TestUser.id=TestDb.userId")
 	query.Where("self.id>0")
 	/**query.Filter(func (one map[string]any) bool {
 		id, ok := one["id"]
@@ -425,9 +426,9 @@ func TestQueryJoin(t *testing.T) {
 	//query.Attr("id", setupUserQuery().ResultPk().AsSQL())
 	//query.Attr("id", []int{1, 2, 3})
 	/**query.Attr("id", setupUserQuery().ResultPk().Where("id>0"))**/
-	query.Attr("createdAt", FuncAbs(-1504256734))
+	query.Attr("createdAt", dbs.FuncAbs(-1504256734))
 	t.Log(query.AsSQL())
-	t.Log(query.params)
+	t.Log(query.TestParams())
 	ones, _, err := query.FindOnes()
 	if err != nil {
 		t.Fatal(err)
@@ -440,7 +441,7 @@ func TestQueryJoin(t *testing.T) {
 func TestQuery_UseIndex(t *testing.T) {
 	query := setupUserQuery()
 	query.UseIndex("a", "b")
-	query.UseIndex("c").For(QueryForOrderBy)
+	query.UseIndex("c").For(dbs.QueryForOrderBy)
 	query.UseIndex()
 	query.IgnoreIndex("d", "e")
 	query.ForceIndex("f")
@@ -455,70 +456,72 @@ func TestQuery_UseIndex2(t *testing.T) {
 
 func TestFuncAbs(t *testing.T) {
 	var query = setupUserQuery()
-	t.Log(query.Result(FuncAbs(SQL("id"))).DescPk().FindCol(0))
+	t.Log(query.Result(dbs.FuncAbs(dbs.SQL("id"))).DescPk().FindCol(0))
 }
 
 func TestFuncRand(t *testing.T) {
 	var query = setupUserQuery()
-	t.Log(query.Result(FuncRand()).FindCol(0))
+	t.Log(query.Result(dbs.FuncRand()).FindCol(0))
 }
 
 func TestFuncFindInSet(t *testing.T) {
 	var query = setupUserQuery()
-	t.Log(query.Result(FuncFindInSet(SQL("id"), "1,2,3")).Pk(4).FindCol(0))
+	t.Log(query.Result(dbs.FuncFindInSet(dbs.SQL("id"), "1,2,3")).Pk(4).FindCol(0))
 }
 
 func TestFuncFromUnixtime(t *testing.T) {
 	{
 		var query = setupUserQuery()
-		t.Log(query.Result(FuncFromUnixtime(SQL("createdAt"))).Pk(4).FindCol(0))
+		t.Log(query.Result(dbs.FuncFromUnixtime(dbs.SQL("createdAt"))).Pk(4).FindCol(0))
 	}
 
 	{
 		var query = setupUserQuery()
-		t.Log(query.Result(FuncFromUnixtimeFormat(SQL("createdAt"), "%Y-%m-%d")).Pk(4).FindCol(0))
+		t.Log(query.Result(dbs.FuncFromUnixtimeFormat(dbs.SQL("createdAt"), "%Y-%m-%d")).Pk(4).FindCol(0))
 	}
 }
 
 func TestFuncConcat(t *testing.T) {
 	{
 		var query = setupUserQuery()
-		t.Log(query.Result(FuncConcat(SQL("id"), ":", "1", ",", 2, ",", 3.5)).Pk(4).FindCol(0))
+		t.Log(query.Result(dbs.FuncConcat(dbs.SQL("id"), ":", "1", ",", 2, ",", 3.5)).Pk(4).FindCol(0))
 	}
 
 	{
 		var query = setupUserQuery()
-		t.Log(query.Result(FuncConcat(1)).Pk(4).FindCol(0))
+		t.Log(query.Result(dbs.FuncConcat(1)).Pk(4).FindCol(0))
 	}
 
 	{
 		var query = setupUserQuery()
-		t.Log(query.Result(FuncConcatWs(", ", SQL("id"), "1", 2, 3.5)).Pk(4).FindCol(0))
+		t.Log(query.Result(dbs.FuncConcatWs(", ", dbs.SQL("id"), "1", 2, 3.5)).Pk(4).FindCol(0))
 	}
 }
 
 func TestFuncLpad(t *testing.T) {
 	{
 		var query = setupUserQuery()
-		t.Log(query.Result(FuncLpad("a", "10", 0)).Pk(4).FindCol(0))
+		t.Log(query.Result(dbs.FuncLpad("a", "10", 0)).Pk(4).FindCol(0))
 	}
 }
 
 func TestIsKeyword(t *testing.T) {
 	var a = assert.NewAssertion(t)
-	var query = NewQuery(nil)
-	a.IsTrue(query.isKeyword("ABCabc123_"))
-	a.IsTrue(query.isKeyword("ABC"))
-	a.IsTrue(query.isKeyword("abc"))
-	a.IsTrue(query.isKeyword("123"))
-	a.IsTrue(query.isKeyword("_"))
-	a.IsFalse(query.isKeyword("ABC "))
-	a.IsFalse(query.isKeyword("中文"))
-	a.IsFalse(query.isKeyword("  "))
+	var query = dbs.NewQuery(nil)
+	a.IsTrue(query.IsKeyword("ABCabc123_"))
+	a.IsTrue(query.IsKeyword("ABC"))
+	a.IsTrue(query.IsKeyword("abc"))
+	a.IsTrue(query.IsKeyword("123"))
+	a.IsTrue(query.IsKeyword("_"))
+	a.IsFalse(query.IsKeyword("ABC "))
+	a.IsFalse(query.IsKeyword("中文"))
+	a.IsFalse(query.IsKeyword("  "))
 }
 
 // old 5500 ns/op -> new 3700
 func BenchmarkQuery_AsSQL(b *testing.B) {
+	var sqlCacheMap = dbs.TestSQLCacheMap()
+
 	for i := 0; i < 90_000; i++ {
 		sqlCacheMap["sql"+types.String(i)] = map[string]any{}
 	}
@@ -526,10 +529,10 @@ func BenchmarkQuery_AsSQL(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		var query = NewQuery(nil)
+		var query = dbs.NewQuery(nil)
 		query.Table("users" + types.String(i%1024))
-		query.DB(&DB{})
-		query.action = QueryActionFind
+		query.DB(&dbs.DB{})
+		query.Action(dbs.QueryActionFind)
 		query.Attr("name", "lily")
 		query.Attr("age", 20)
 		query.Attr("id", 123)
@@ -540,6 +543,8 @@ func BenchmarkQuery_AsSQL(b *testing.B) {
 }
 
 func BenchmarkQuery_AsSQL2(b *testing.B) {
+	var sqlCacheMap = dbs.TestSQLCacheMap()
+
 	for i := 0; i < 90_000; i++ {
 		sqlCacheMap["sql"+types.String(i)] = map[string]any{}
 	}
@@ -547,10 +552,10 @@ func BenchmarkQuery_AsSQL2(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		var query = NewQuery(nil)
+		var query = dbs.NewQuery(nil)
 		query.Table("users_" + types.String(i%1000))
-		query.DB(&DB{})
-		query.action = QueryActionFind
+		query.DB(&dbs.DB{})
+		query.Action(dbs.QueryActionFind)
 
 		query.Where("name=:name AND age=:age").
 			Where("created_at>0")
@@ -578,19 +583,19 @@ func BenchmarkQuery_AsSQL2(b *testing.B) {
 
 func BenchmarkQuery_wrapAttr(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		var query = NewQuery(nil)
+		var query = dbs.NewQuery(nil)
 		query.Table("users")
-		query.DB(&DB{})
-		_, _ = query.wrapAttr("123")
+		query.DB(&dbs.DB{})
+		_, _ = query.WrapAttr("123")
 	}
 }
 
 func BenchmarkQuery_isKeyword(b *testing.B) {
 	var keywordRegexp = regexp.MustCompile(`^\w+$`)
-	var query = NewQuery(nil)
+	var query = dbs.NewQuery(nil)
 
 	for i := 0; i < b.N; i++ {
-		query.isKeyword("abcABC123")
+		query.IsKeyword("abcABC123")
 		//keywordRegexp.MatchString("abcABC123")
 	}
 
@@ -604,7 +609,7 @@ func BenchmarkQuery_FindOne(b *testing.B) {
 
 		query.Result("id", "name", "gender", "state")
 		query.Where("id=100")
-		query.SQLCache(QuerySqlCacheOn)
+		query.SQLCache(dbs.QuerySqlCacheOn)
 
 		_, _, err := query.FindOne()
 		if err != nil {
@@ -632,7 +637,7 @@ func BenchmarkQuery_FindOne(b *testing.B) {
 }
 
 func BenchmarkQuery_FindOne_DB(b *testing.B) {
-	db, err := Default()
+	db, err := dbs.Default()
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -652,11 +657,11 @@ func BenchmarkQuery_FindOne_DB(b *testing.B) {
 	})
 }
 
-var testDBInstance *DB
+var testDBInstance *dbs.DB
 
-func setupUserQuery() *Query {
+func setupUserQuery() *dbs.Query {
 	if testDBInstance == nil {
-		db, err := NewInstanceFromConfig(&DBConfig{
+		db, err := dbs.NewInstanceFromConfig(&dbs.DBConfig{
 			Driver: "mysql",
 			Dsn:    "root:123456@tcp(127.0.0.1:3306)/db_test?charset=utf8mb4&timeout=30s",
 			Prefix: "",
@@ -676,7 +681,7 @@ func setupUserQuery() *Query {
 		testDBInstance = db
 	}
 
-	var query = NewQuery(new(TestUser))
+	var query = dbs.NewQuery(new(TestUser))
 	query.Table("users")
 	query.DB(testDBInstance)
 	return query

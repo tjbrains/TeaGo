@@ -1,14 +1,15 @@
-package timers
+package timers_test
 
 import (
 	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/timers"
 	"testing"
 	"time"
 )
 
 func TestDelay(t *testing.T) {
 	t.Log(time.Now(), "start")
-	Delay(3*time.Second, func(timer *time.Timer) {
+	timers.Delay(3*time.Second, func(timer *time.Timer) {
 		t.Log(time.Now(), "run task")
 	})
 
@@ -17,12 +18,12 @@ func TestDelay(t *testing.T) {
 
 func TestAt(t *testing.T) {
 	t.Log(time.Now(), "start")
-	At(time.Now().Add(5*time.Second), func(timer *time.Timer) {
+	timers.At(time.Now().Add(5*time.Second), func(timer *time.Timer) {
 		t.Log(time.Now(), "run task")
 	})
 	//timer.Stop()
 
-	At(time.Now().Add(-5*time.Second), func(timer *time.Timer) {
+	timers.At(time.Now().Add(-5*time.Second), func(timer *time.Timer) {
 		t.Log(time.Now(), "run task2")
 	})
 
@@ -33,7 +34,7 @@ func TestEvery(t *testing.T) {
 	t.Log(time.Now(), "start")
 	i := 0
 	var ticker *time.Ticker
-	ticker = Every(3*time.Second, func(timer *time.Ticker) {
+	ticker = timers.Every(3*time.Second, func(timer *time.Ticker) {
 		t.Log(time.Now(), "run task")
 		i++
 
@@ -46,11 +47,11 @@ func TestEvery(t *testing.T) {
 }
 
 func TestLoop(t *testing.T) {
-	looper := Loop(1*time.Second, func(looper *Looper) {
+	var looper = timers.Loop(1*time.Second, func(looper *timers.Looper) {
 		logs.Println(time.Now())
 	})
 
-	Delay(5*time.Second, func(timer *time.Timer) {
+	timers.Delay(5*time.Second, func(timer *time.Timer) {
 		looper.Stop()
 	})
 
@@ -59,8 +60,8 @@ func TestLoop(t *testing.T) {
 }
 
 func TestLoop2(t *testing.T) {
-	fromTime := time.Now()
-	looper := Loop(2*time.Second, func(looper *Looper) {
+	var fromTime = time.Now()
+	var looper = timers.Loop(2*time.Second, func(looper *timers.Looper) {
 		logs.Println(time.Now())
 
 		if time.Since(fromTime) > 3*time.Second {

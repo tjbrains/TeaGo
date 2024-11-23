@@ -1,16 +1,17 @@
-package files
+package files_test
 
 import (
-	"testing"
+	"github.com/tjbrains/TeaGo/files"
 	"os"
+	"testing"
 )
 
 func TestSortSize(t *testing.T) {
-	files := NewFile(os.Getenv("GOPATH") + "/src/github.com/tjbrains/TeaGo").List()
+	var fileObject = files.NewFile(os.Getenv("GOPATH") + "/src/github.com/tjbrains/TeaGo").List()
 
-	Sort(files, SortTypeSize)
+	files.Sort(fileObject, files.SortTypeSize)
 
-	for _, file := range files {
+	for _, file := range fileObject {
 		size, _ := file.Size()
 		if file.IsDir() {
 			t.Log("d:"+file.Name(), size)
@@ -21,11 +22,11 @@ func TestSortSize(t *testing.T) {
 }
 
 func TestSortKind(t *testing.T) {
-	files := NewFile(os.Getenv("GOPATH") + "/src/github.com/tjbrains/TeaGo").List()
+	var fileObject = files.NewFile(os.Getenv("GOPATH") + "/src/github.com/tjbrains/TeaGo").List()
 
-	Sort(files, SortTypeKind)
+	files.Sort(fileObject, files.SortTypeKind)
 
-	for _, file := range files {
+	for _, file := range fileObject {
 		if file.IsDir() {
 			t.Log("d:" + file.Name())
 		} else {
@@ -35,11 +36,11 @@ func TestSortKind(t *testing.T) {
 }
 
 func TestSortKindReverse(t *testing.T) {
-	files := NewFile(os.Getenv("GOPATH") + "/src/github.com/tjbrains/TeaGo").List()
+	var fileObject = files.NewFile(os.Getenv("GOPATH") + "/src/github.com/tjbrains/TeaGo").List()
 
-	Sort(files, SortTypeKindReverse)
+	files.Sort(fileObject, files.SortTypeKindReverse)
 
-	for _, file := range files {
+	for _, file := range fileObject {
 		if file.IsDir() {
 			t.Log("d:" + file.Name())
 		} else {

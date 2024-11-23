@@ -15,14 +15,16 @@ import (
 	"sync"
 )
 
+type QueryAction = int
+
 const (
-	QueryActionFind           = 1
-	QueryActionDelete         = 2
-	QueryActionInsert         = 3
-	QueryActionReplace        = 4
-	QueryActionInsertOrUpdate = 5
-	QueryActionUpdate         = 6
-	QueryActionExec           = 7
+	QueryActionFind           QueryAction = 1
+	QueryActionDelete         QueryAction = 2
+	QueryActionInsert         QueryAction = 3
+	QueryActionReplace        QueryAction = 4
+	QueryActionInsertOrUpdate QueryAction = 5
+	QueryActionUpdate         QueryAction = 6
+	QueryActionExec           QueryAction = 7
 )
 
 const (
@@ -69,6 +71,10 @@ var ErrNotFound = errors.New("record not found")
 // SQL缓存
 var sqlCacheMap = map[string]map[string]any{} // sql => { params:[]string{} sql:string }
 var sqlCacheLocker = sync.RWMutex{}
+
+func TestSQLCacheMap() map[string]map[string]any {
+	return sqlCacheMap
+}
 
 type Query struct {
 	db  *DB
@@ -203,6 +209,12 @@ func (this *Query) Table(table string) *Query {
 	return this
 }
 
+// Action 设置动作
+func (this *Query) Action(action QueryAction) *Query {
+	this.action = action
+	return this
+}
+
 // Reuse 是否可以重用，对于根据参数变化而变化的查询，需要设置为false
 func (this *Query) Reuse(canReuse bool) *Query {
 	this.canReuse = canReuse
@@ -231,7 +243,7 @@ func (this *Query) PkName(pkName string) *Query {
 
 // Attr 设置查询的字段
 func (this *Query) Attr(name string, value any) *Query {
-	placeholder, isSlice := this.wrapAttr(value)
+	placeholder, isSlice := this.WrapAttr(value)
 	if isSlice {
 		this.attrs.Put(name, this.wrapKeyword(name)+" "+placeholder)
 	} else {
@@ -435,7 +447,7 @@ func (this *Query) Group(field string, order ...int) *Query {
 // Like 设置like查询条件
 // 对表达式自动加上百分号， % ... %
 func (this *Query) Like(field string, expr string) *Query {
-	wrappedValue, _ := this.wrapAttr("%" + expr + "%")
+	wrappedValue, _ := this.WrapAttr("%" + expr + "%")
 	this.Where(this.wrapKeyword(field) + " LIKE " + wrappedValue)
 	return this
 }
@@ -545,8 +557,8 @@ func (this *Query) Pk(pks ...any) *Query {
 
 // Between 设置between条件
 func (this *Query) Between(field string, min any, max any) *Query {
-	minValue, _ := this.wrapAttr(min)
-	maxValue, _ := this.wrapAttr(max)
+	minValue, _ := this.WrapAttr(min)
+	maxValue, _ := this.WrapAttr(max)
 	this.Where(field + " BETWEEN " + minValue + " AND " + maxValue)
 	return this
 }
@@ -833,11 +845,11 @@ func (this *Query) AsSQL() (string, error) {
 	if this.subAction == 0 {
 		if this.limit > -1 {
 			if this.offset > -1 {
-				offsetValue, _ := this.wrapAttr(this.offset)
-				limitValue, _ := this.wrapAttr(this.limit)
+				offsetValue, _ := this.WrapAttr(this.offset)
+				limitValue, _ := this.WrapAttr(this.limit)
 				sqlString += "\n LIMIT " + types.String(offsetValue) + ", " + types.String(limitValue)
 			} else {
-				limitValue, _ := this.wrapAttr(this.limit)
+				limitValue, _ := this.WrapAttr(this.limit)
 				sqlString += "\n LIMIT " + types.String(limitValue)
 			}
 		}
@@ -1636,7 +1648,7 @@ func (this *Query) DeleteQuickly() error {
 	return err
 }
 
-func (this *Query) stringValue(value any) any {
+func (this *Query) FormatScalar(value any) any {
 	if value == nil {
 		return nil
 	}
@@ -1658,8 +1670,8 @@ func (this *Query) stringValue(value any) any {
 	return types.String(value)
 }
 
-// 包装值
-func (this *Query) wrapAttr(value any) (placeholder string, isArray bool) {
+// WrapAttr 包装值
+func (this *Query) WrapAttr(value any) (placeholder string, isArray bool) {
 	switch value1 := value.(type) {
 	case SQL:
 		return string(value1), false
@@ -1681,7 +1693,7 @@ func (this *Query) wrapAttr(value any) (placeholder string, isArray bool) {
 
 		return "IN (" + sqlString + ")", true
 	case *lists.List:
-		return this.wrapAttr(value1.Slice)
+		return this.WrapAttr(value1.Slice)
 	case JSON:
 		var param = "TEA_PARAM_" + this.namedParamPrefix + strconv.Itoa(this.namedParamIndex)
 		this.namedParams[param] = string(value1)
@@ -1701,7 +1713,7 @@ func (this *Query) wrapAttr(value any) (placeholder string, isArray bool) {
 		var reflectValue = reflect.ValueOf(value)
 		var countElements = reflectValue.Len()
 		for i := 0; i < countElements; i++ {
-			var v, _ = this.wrapAttr(reflectValue.Index(i).Interface())
+			var v, _ = this.WrapAttr(reflectValue.Index(i).Interface())
 			params = append(params, v)
 		}
 		countParams := len(params)
@@ -1734,7 +1746,7 @@ func (this *Query) wrapValue(value any) (placeholder string) {
 		value = string(v)
 	case int, uint, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64, string:
 	default:
-		value = this.stringValue(value)
+		value = this.FormatScalar(value)
 	}
 
 	var param = "TEA_PARAM_" + this.namedParamPrefix + strconv.Itoa(this.namedParamIndex)
@@ -1749,7 +1761,7 @@ func (this *Query) wrapKeyword(keyword string) string {
 		logs.Errorf("[Query.wrapKeyword()]query.db should be not nil")
 		return "\"" + keyword + "\""
 	}
-	if !this.isKeyword(keyword) {
+	if !this.IsKeyword(keyword) {
 		return keyword
 	}
 	switch this.db.Driver() {
@@ -1776,7 +1788,7 @@ func (this *Query) wrapTable(keyword string) string {
 		logs.Errorf("[Query.wrapKeyword()]query.db should be not nil")
 		return "\"" + keyword + "\""
 	}
-	if !this.isKeyword(keyword) {
+	if !this.IsKeyword(keyword) {
 		return keyword
 	}
 	switch this.db.Driver() {
@@ -1848,8 +1860,8 @@ func (this *Query) executor() SQLExecutor {
 	return this.db
 }
 
-// 判断某个字符串是否为关键词
-func (this *Query) isKeyword(s string) bool {
+// IsKeyword 判断某个字符串是否为关键词
+func (this *Query) IsKeyword(s string) bool {
 	for _, r := range s {
 		if r == '_' || (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') {
 			continue
@@ -1857,6 +1869,18 @@ func (this *Query) isKeyword(s string) bool {
 		return false
 	}
 	return true
+}
+
+func (this *Query) TestAttrs() *maps.OrderedMap[string, string] {
+	return this.attrs
+}
+
+func (this *Query) TestParams() []any {
+	return this.params
+}
+
+func (this *Query) TestNameParams() map[string]any {
+	return this.namedParams
 }
 
 // 分析语句中的占位

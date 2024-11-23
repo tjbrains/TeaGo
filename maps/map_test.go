@@ -1,12 +1,13 @@
-package maps
+package maps_test
 
 import (
 	"github.com/tjbrains/TeaGo/assert"
+	"github.com/tjbrains/TeaGo/maps"
 	"testing"
 )
 
 func TestMap(t *testing.T) {
-	m := Map{
+	var m = maps.Map{
 		"name":     "Lu",
 		"age":      20,
 		"price":    123.45,
@@ -42,24 +43,24 @@ func TestMap(t *testing.T) {
 }
 
 func TestNewMap(t *testing.T) {
-	m := NewMap()
+	var m = maps.NewMap()
 	m["name"] = "Lu"
 	t.Log(m)
 }
 
 func TestMapConvert(t *testing.T) {
-	m := NewMap(map[string]interface{}{
+	var m = maps.NewMap(map[string]interface{}{
 		"name":     "Lu",
 		"age":      20,
 		"price":    123.45,
 		"isOnline": true,
 	})
 
-	t.Log(NewMap(m))
+	t.Log(maps.NewMap(m))
 }
 
 func TestMap_JSON(t *testing.T) {
-	m := NewMap(map[string]interface{}{
+	var m = maps.NewMap(map[string]interface{}{
 		"name":     "Lu",
 		"age":      20,
 		"price":    123.45,
@@ -70,7 +71,7 @@ func TestMap_JSON(t *testing.T) {
 }
 
 func TestMap_DecodeJSON(t *testing.T) {
-	m := NewMap(map[string]interface{}{
+	var m = maps.NewMap(map[string]interface{}{
 		"name":     "Lu",
 		"age":      20,
 		"price":    123.45,
@@ -78,7 +79,7 @@ func TestMap_DecodeJSON(t *testing.T) {
 	})
 	jsonData := m.AsPrettyJSON()
 
-	m, err := DecodeJSON(jsonData)
+	m, err := maps.DecodeJSON(jsonData)
 	if err != nil {
 		t.Fatal(err)
 	}

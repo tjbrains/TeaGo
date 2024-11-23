@@ -1,12 +1,13 @@
-package files
+package files_test
 
 import (
-	"testing"
 	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/files"
+	"testing"
 )
 
 func TestWriter_Write(t *testing.T) {
-	tmpFile := NewFile(Tea.TmpFile("test.txt"))
+	var tmpFile = files.NewFile(Tea.TmpFile("test.txt"))
 	writer, err := tmpFile.Writer()
 	if err != nil {
 		t.Fatal(err)

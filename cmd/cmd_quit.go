@@ -2,7 +2,7 @@ package cmd
 
 import "os"
 
-// 退出命令
+// QuitCommand 退出命令
 type QuitCommand struct {
 	*Command
 }

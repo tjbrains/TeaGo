@@ -1,13 +1,14 @@
-package caches
+package caches_test
 
 import (
+	"github.com/tjbrains/TeaGo/caches"
 	"testing"
 	"time"
 )
 
 func TestOnce(t *testing.T) {
 	type OtherObject struct {
-		CacheFactory
+		caches.CacheFactory
 	}
 
 	o := new(OtherObject)
@@ -21,7 +22,7 @@ func TestOnce(t *testing.T) {
 
 func TestFactory_Integrate(t *testing.T) {
 	type OtherObject struct {
-		CacheFactory
+		caches.CacheFactory
 	}
 
 	var o = new(OtherObject)

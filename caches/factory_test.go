@@ -1,12 +1,13 @@
-package caches
+package caches_test
 
 import (
+	"github.com/tjbrains/TeaGo/caches"
 	"testing"
 	"time"
 )
 
 func TestNewFactory(t *testing.T) {
-	factory := NewFactory()
+	var factory = caches.NewFactory()
 	factory.Set("hello", "world").ExpireAt(time.Now().Add(10 * time.Second))
 
 	value, found := factory.Get("hello")
@@ -22,21 +23,19 @@ func TestNewFactory(t *testing.T) {
 }
 
 func TestNewFactory_Clean(t *testing.T) {
-	factory := NewFactory()
+	var factory = caches.NewFactory()
 	factory.Set("hello", "world").ExpireAt(time.Now().Add(-10 * time.Second))
-	t.Log(len(factory.items))
-	factory.clean()
-	t.Log(len(factory.items))
+	t.Log(len(factory.Items()))
+	factory.Clean()
+	t.Log(len(factory.Items()))
 }
 
 func TestNewFactory_CleanLoop(t *testing.T) {
-	factory := newFactoryInterval(1 * time.Second)
+	var factory = caches.NewFactoryInterval(1 * time.Second)
 	factory.Set("hello", "world").ExpireAt(time.Now().Add(2 * time.Second))
-
-	t.Log(factory.items["hello"].expireTime)
 
 	time.Sleep(3 * time.Second)
 
 	t.Log(time.Now())
-	t.Log(len(factory.items))
+	t.Log(len(factory.Items()))
 }
