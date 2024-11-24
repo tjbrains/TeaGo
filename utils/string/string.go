@@ -30,17 +30,18 @@ func Contains(slice []string, item string) bool {
 
 // RegexpCompile 生成可重用的正则
 func RegexpCompile(pattern string) (*regexp.Regexp, error) {
-	reuseRegexpMutex.Lock()
-	defer reuseRegexpMutex.Unlock()
-
+	reuseRegexpMutex.RLock()
 	reg, ok := reuseRegexpMap[pattern]
+	reuseRegexpMutex.RUnlock()
 	if ok {
 		return reg, nil
 	}
 
 	reg, err := regexp.Compile(pattern)
 	if err == nil {
+		reuseRegexpMutex.Lock()
 		reuseRegexpMap[pattern] = reg
+		reuseRegexpMutex.Unlock()
 	}
 	return reg, err
 }
@@ -107,7 +108,7 @@ func ParseFileSize(sizeString string) (float64, error) {
 		if err != nil {
 			return 0, err
 		} else {
-			unit := matches[2]
+			var unit = matches[2]
 			if unit == "k" || unit == "kb" {
 				size = size * math.Pow(1024, 1)
 			} else if unit == "m" || unit == "mb" {
@@ -146,20 +147,20 @@ func VersionCompare(version1 string, version2 string) int8 {
 		return 1
 	}
 
-	pieces1 := strings.Split(version1, ".")
-	pieces2 := strings.Split(version2, ".")
-	count1 := len(pieces1)
-	count2 := len(pieces2)
+	var pieces1 = strings.Split(version1, ".")
+	var pieces2 = strings.Split(version2, ".")
+	var count1 = len(pieces1)
+	var count2 = len(pieces2)
 
 	for i := 0; i < count1; i++ {
 		if i > count2-1 {
 			return 1
 		}
 
-		piece1 := pieces1[i]
-		piece2 := pieces2[i]
-		len1 := len(piece1)
-		len2 := len(piece2)
+		var piece1 = pieces1[i]
+		var piece2 = pieces2[i]
+		var len1 = len(piece1)
+		var len2 = len(piece2)
 
 		if len1 == 0 {
 			if len2 == 0 {

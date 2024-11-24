@@ -1,12 +1,13 @@
-package rsa
+package rsa_test
 
 import (
 	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/rsa"
 	"testing"
 )
 
 func TestRSA_Encrypt(t *testing.T) {
-	r, err := NewRSA(Tea.Root+"/certs/app.crt", Tea.Root+"/certs/app.key")
+	r, err := rsa.NewRSA(Tea.Root+"/certs/app.crt", Tea.Root+"/certs/app.key")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -26,7 +27,7 @@ func TestRSA_Encrypt(t *testing.T) {
 }
 
 func TestRSA_Decrypt(t *testing.T) {
-	r, err := NewRSA(Tea.Root+"/certs/app.crt", Tea.Root+"/certs/app.key")
+	r, err := rsa.NewRSA(Tea.Root+"/certs/app.crt", Tea.Root+"/certs/app.key")
 	if err != nil {
 		t.Fatal(err)
 	}

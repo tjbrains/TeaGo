@@ -66,12 +66,33 @@ func TestParseFileSize(t *testing.T) {
 	}
 }
 
+func TestRegexpCompile(t *testing.T) {
+	for range 3 {
+		reg, err := stringutil.RegexpCompile(`^\d+$`)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log(reg.MatchString("123"))
+	}
+}
+
 func BenchmarkMd5Pool(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			var sum = stringutil.MD5("123456")
 			if sum != "e10adc3949ba59abbe56e057f20f883e" {
 				b.Fatal("fail:", sum)
+			}
+		}
+	})
+}
+
+func BenchmarkRegexpCompile(b *testing.B) {
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			_, err := stringutil.RegexpCompile(`^\d+$`)
+			if err != nil {
+				b.Fatal(err)
 			}
 		}
 	})

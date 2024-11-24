@@ -1,9 +1,12 @@
-package actions
+package actions_test
 
-import "testing"
+import (
+	"github.com/tjbrains/TeaGo/actions"
+	"testing"
+)
 
 func TestData(t *testing.T) {
-	data := Data{}
+	var data = actions.Data{}
 	data["a"] = "b"
 	t.Log(data)
 }

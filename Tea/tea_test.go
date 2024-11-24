@@ -1,23 +1,23 @@
-package Tea
+package Tea_test
 
 import (
+	"github.com/tjbrains/TeaGo/Tea"
 	"github.com/tjbrains/TeaGo/assert"
 	"os"
 	"testing"
 )
 
 func TestFindLatestDir(t *testing.T) {
-	t.Log(Root)
-	t.Log(findLatestDir(Root, "public"))
+	t.Log(Tea.Root)
 }
 
 func TestTmpDir(t *testing.T) {
-	t.Log(TmpDir())
-	t.Log(TmpFile("test.json"))
+	t.Log(Tea.TmpDir())
+	t.Log(Tea.TmpFile("test.json"))
 }
 
 func TestIsTesting(t *testing.T) {
 	a := assert.NewAssertion(t).Quiet()
-	a.IsTrue(IsTesting())
+	a.IsTrue(Tea.IsTesting())
 	t.Log(os.Args)
 }

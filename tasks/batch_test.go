@@ -1,11 +1,12 @@
-package tasks
+package tasks_test
 
 import (
+	"github.com/tjbrains/TeaGo/tasks"
 	"testing"
 )
 
 func TestBatch_Run(t *testing.T) {
-	b := NewBatch()
+	var b = tasks.NewBatch()
 	b.Add(func() {
 		t.Log("1")
 	})

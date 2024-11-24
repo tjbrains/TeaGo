@@ -3,9 +3,9 @@ package byteutil
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"io"
 	"crypto/rand"
 	"errors"
+	"io"
 )
 
 func Encrypt(source []byte, key []byte) ([]byte, error) {
@@ -13,7 +13,7 @@ func Encrypt(source []byte, key []byte) ([]byte, error) {
 		key = key[:32]
 	} else {
 		padding := 32 - len(key)
-		for i := 0; i < padding; i ++ {
+		for i := 0; i < padding; i++ {
 			key = append(key, ' ')
 		}
 	}
@@ -41,7 +41,7 @@ func Decrypt(encryptedData []byte, key []byte) ([]byte, error) {
 		key = key[:32]
 	} else {
 		padding := 32 - len(key)
-		for i := 0; i < padding; i ++ {
+		for i := 0; i < padding; i++ {
 			key = append(key, ' ')
 		}
 	}

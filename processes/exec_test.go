@@ -1,7 +1,10 @@
-package processes
+package processes_test
 
-import "testing"
+import (
+	"github.com/tjbrains/TeaGo/processes"
+	"testing"
+)
 
 func TestExecAndReturn(t *testing.T) {
-	t.Log(Exec("/usr/local/bin/php", "-v"))
+	t.Log(processes.Exec("/usr/local/bin/php", "-v"))
 }

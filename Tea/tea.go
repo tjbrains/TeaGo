@@ -31,7 +31,7 @@ func init() {
 	Root = findRoot()
 }
 
-// 判断是否在某个特定环境下
+// Is 判断是否在某个特定环境下
 func Is(env ...string) bool {
 	if len(env) == 0 {
 		return false
@@ -44,7 +44,7 @@ func Is(env ...string) bool {
 	return false
 }
 
-// 判断是否在测试模式下
+// IsTesting 判断是否在测试模式下
 func IsTesting() bool {
 	return isTesting
 }
@@ -58,7 +58,7 @@ func checkIsTesting() bool {
 		strings.HasSuffix(execFile, ".test.exe")
 }
 
-// 取得临时目录
+// TmpDir 取得临时目录
 func TmpDir() string {
 	if len(tmpDir) > 0 {
 		return tmpDir
@@ -66,12 +66,12 @@ func TmpDir() string {
 	return Root + DS + "tmp"
 }
 
-// 设置临时目录
+// SetTmpDir 设置临时目录
 func SetTmpDir(dir string) {
 	tmpDir = dir
 }
 
-// 取得临时文件
+// TmpFile 取得临时文件
 func TmpFile(file string) string {
 	if runtime.GOOS == "windows" {
 		file = strings.Replace(file, "/", DS, -1)
