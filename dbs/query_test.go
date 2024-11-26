@@ -657,6 +657,31 @@ func BenchmarkQuery_FindOne_DB(b *testing.B) {
 	})
 }
 
+func BenchmarkQuery_Exec(b *testing.B) {
+	setupUserQuery()
+
+	b.ResetTimer()
+
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			var query = dbs.NewQuery(new(TestUser))
+			query.Table("users")
+			query.DB(testDBInstance)
+			query.SQL("UPDATE `users` SET password='1234567' WHERE id=:userId").
+				Param("userId", 1024)
+
+			var result, execErr = query.Exec()
+			if execErr != nil {
+				b.Fatal(execErr)
+			}
+			_, execErr = result.RowsAffected()
+			if execErr != nil {
+				b.Fatal(execErr)
+			}
+		}
+	})
+}
+
 var testDBInstance *dbs.DB
 
 func setupUserQuery() *dbs.Query {
