@@ -11,6 +11,7 @@ import (
 
 type Rows struct {
 	rawRows *sql.Rows
+	columns []string
 }
 
 func NewRows(rawRows *sql.Rows) *Rows {
@@ -20,7 +21,15 @@ func NewRows(rawRows *sql.Rows) *Rows {
 }
 
 func (this *Rows) Columns() ([]string, error) {
-	return this.rawRows.Columns()
+	if len(this.columns) > 0 {
+		return this.columns, nil
+	}
+	columns, err := this.rawRows.Columns()
+	if err != nil {
+		return nil, err
+	}
+	this.columns = columns
+	return columns, nil
 }
 
 func (this *Rows) Close() error {

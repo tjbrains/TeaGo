@@ -24,6 +24,18 @@ func (this *Stmt) Query(args ...any) (*sql.Rows, error) {
 	return this.rawStmt.Query(args...)
 }
 
+func (this *Stmt) FindRows(args ...any) (rows *Rows, err error) {
+	this.accessAt = unixTime()
+
+	rawRows, err := this.rawStmt.Query(args...)
+	if err != nil {
+		return nil, err
+	}
+
+	rows = NewRows(rawRows)
+	return
+}
+
 func (this *Stmt) FindOnes(args ...any) (ones []maps.Map, columnNames []string, err error) {
 	this.accessAt = unixTime()
 

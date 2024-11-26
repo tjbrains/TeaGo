@@ -609,7 +609,7 @@ func BenchmarkQuery_FindOne(b *testing.B) {
 
 		query.Result("id", "name", "gender", "state")
 		query.Where("id=100")
-		query.SQLCache(dbs.QuerySqlCacheOn)
+		//query.SQLCache(dbs.QuerySqlCacheOn)
 
 		_, _, err := query.FindOne()
 		if err != nil {
