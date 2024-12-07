@@ -73,13 +73,13 @@ type Server struct {
 	routerLocker  sync.Mutex
 	staticDirs    []ServerStaticDir
 
-	sessionManager    interface{}
+	sessionManager    any
 	sessionCookieName string
 
-	lastModule  string        //当前的模块
-	lastPrefix  string        //当前的URL前缀
-	lastHelpers []interface{} // 当前的Helper列表
-	lastData    actions.Data  // 当前的变量列表
+	lastModule  string       //当前的模块
+	lastPrefix  string       //当前的URL前缀
+	lastHelpers []any        // 当前的Helper列表
+	lastData    actions.Data // 当前的变量列表
 
 	config    *ServerConfig
 	logWriter LogWriter
@@ -92,6 +92,8 @@ type Server struct {
 	internalErrorLogger *log.Logger
 	readHeaderTimeout   time.Duration
 	readTimeout         time.Duration
+
+	beforeRequestFunc func(writer http.ResponseWriter, req *http.Request) bool
 }
 
 // ServerRoutePattern 路由配置
@@ -252,6 +254,13 @@ func (this *Server) StartOn(address string) {
 		// 输出日志
 		if this.accessLog {
 			defer this.logWriter.Print(time.Now(), writer.(*responseWriter), request)
+		}
+
+		// call before request callback
+		if this.beforeRequestFunc != nil {
+			if !this.beforeRequestFunc(writer, request) {
+				return
+			}
 		}
 
 		var requestPath = request.URL.Path
@@ -475,8 +484,14 @@ func (this *Server) Stop() {
 	})
 }
 
+// BeforeRequest 请求前回调
+func (this *Server) BeforeRequest(fn func(writer http.ResponseWriter, req *http.Request) bool) *Server {
+	this.beforeRequestFunc = fn
+	return this
+}
+
 // 配置路由
-func (this *Server) router(pattern string, method string, actionPtr interface{}) {
+func (this *Server) router(pattern string, method string, actionPtr any) {
 	this.routerLocker.Lock()
 	defer this.routerLocker.Unlock()
 
@@ -531,7 +546,7 @@ func (this *Server) router(pattern string, method string, actionPtr interface{})
 	this.directRoutes[key] = this.buildHandle(actionPtr)
 }
 
-func (this *Server) buildHandle(actionPtr interface{}) func(writer http.ResponseWriter, request *http.Request) {
+func (this *Server) buildHandle(actionPtr any) func(writer http.ResponseWriter, request *http.Request) {
 	// 是否为函数
 	if reflect.TypeOf(actionPtr).Kind() == reflect.Func {
 		{
@@ -662,7 +677,7 @@ func (this *Server) EndPrefix() *Server {
 }
 
 // Data 设置变量
-func (this *Server) Data(name string, value interface{}) *Server {
+func (this *Server) Data(name string, value any) *Server {
 	if this.lastData == nil {
 		this.lastData = actions.Data{}
 	}
@@ -677,7 +692,7 @@ func (this *Server) EndData() *Server {
 }
 
 // Helper 定义助手
-func (this *Server) Helper(helper interface{}) *Server {
+func (this *Server) Helper(helper any) *Server {
 	if helper == nil {
 		logs.Error(errors.New("you try to add a nil helper"))
 		return this
@@ -705,7 +720,7 @@ func (this *Server) Helper(helper interface{}) *Server {
 
 // EndHelpers 结束助手定义
 func (this *Server) EndHelpers() *Server {
-	this.lastHelpers = []interface{}{}
+	this.lastHelpers = []any{}
 	return this
 }
 
@@ -719,66 +734,66 @@ func (this *Server) EndAll() *Server {
 }
 
 // Get 设置 GET 方法路由映射
-func (this *Server) Get(path string, actionPtr interface{}) *Server {
+func (this *Server) Get(path string, actionPtr any) *Server {
 	this.router(path, "get", actionPtr)
 	return this
 }
 
 // Post 设置 POST 方法路由映射
-func (this *Server) Post(path string, actionPtr interface{}) *Server {
+func (this *Server) Post(path string, actionPtr any) *Server {
 	this.router(path, "post", actionPtr)
 	return this
 }
 
 // GetPost 设置 GET 和 POST 方法路由映射
-func (this *Server) GetPost(path string, actionPtr interface{}) *Server {
+func (this *Server) GetPost(path string, actionPtr any) *Server {
 	return this.Any([]string{"get", "post"}, path, actionPtr)
 }
 
 // Head 设置 HEAD 方法路由映射
-func (this *Server) Head(path string, actionPtr interface{}) *Server {
+func (this *Server) Head(path string, actionPtr any) *Server {
 	this.router(path, "head", actionPtr)
 	return this
 }
 
 // Delete 设置 DELETE 方法路由映射
-func (this *Server) Delete(path string, actionPtr interface{}) *Server {
+func (this *Server) Delete(path string, actionPtr any) *Server {
 	this.router(path, "delete", actionPtr)
 	return this
 }
 
 // Purge 设置 PURGE 方法路由映射
-func (this *Server) Purge(path string, actionPtr interface{}) *Server {
+func (this *Server) Purge(path string, actionPtr any) *Server {
 	this.router(path, "purge", actionPtr)
 	return this
 }
 
 // Put 设置 PUT 方法路由映射
-func (this *Server) Put(path string, actionPtr interface{}) *Server {
+func (this *Server) Put(path string, actionPtr any) *Server {
 	this.router(path, "put", actionPtr)
 	return this
 }
 
 // Options 设置 OPTIONS 方法路由映射
-func (this *Server) Options(path string, actionPtr interface{}) *Server {
+func (this *Server) Options(path string, actionPtr any) *Server {
 	this.router(path, "options", actionPtr)
 	return this
 }
 
 // Trace 设置 TRACE 方法路由映射
-func (this *Server) Trace(path string, actionPtr interface{}) *Server {
+func (this *Server) Trace(path string, actionPtr any) *Server {
 	this.router(path, "trace", actionPtr)
 	return this
 }
 
 // Connect 设置 CONNECT 方法路由映射
-func (this *Server) Connect(path string, actionPtr interface{}) *Server {
+func (this *Server) Connect(path string, actionPtr any) *Server {
 	this.router(path, "connect", actionPtr)
 	return this
 }
 
 // Any 设置一组方法路由映射
-func (this *Server) Any(methods []string, path string, actionPtr interface{}) *Server {
+func (this *Server) Any(methods []string, path string, actionPtr any) *Server {
 	for _, method := range methods {
 		this.router(path, method, actionPtr)
 	}
@@ -786,7 +801,7 @@ func (this *Server) Any(methods []string, path string, actionPtr interface{}) *S
 }
 
 // All 将所有方法映射到路由
-func (this *Server) All(path string, actionPtr interface{}) *Server {
+func (this *Server) All(path string, actionPtr any) *Server {
 	this.router(path, "*", actionPtr)
 	return this
 }
@@ -807,7 +822,7 @@ func (this *Server) ConnState(connState func(conn net.Conn, state http.ConnState
 }
 
 // Session 设置SESSION管理器
-func (this *Server) Session(sessionManager interface{}, cookieName string) *Server {
+func (this *Server) Session(sessionManager any, cookieName string) *Server {
 	this.sessionManager = sessionManager
 	this.sessionCookieName = cookieName
 	return this
