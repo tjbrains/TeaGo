@@ -76,7 +76,16 @@ func TestRegexpCompile(t *testing.T) {
 	}
 }
 
-func BenchmarkMd5Pool(b *testing.B) {
+func TestMD5(t *testing.T) {
+	t.Log(stringutil.MD5("123456")) // e10adc3949ba59abbe56e057f20f883e
+	t.Log(stringutil.MD5("123456"))
+	t.Log(stringutil.MD5("123456"))
+	t.Log(stringutil.MD5("123")) // 202cb962ac59075b964b07152d234b70
+}
+
+func BenchmarkMD5(b *testing.B) {
+	b.ReportAllocs()
+
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			var sum = stringutil.MD5("123456")

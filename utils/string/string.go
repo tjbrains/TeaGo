@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/tjbrains/TeaGo/rands"
-	"hash"
 	"math"
 	"regexp"
 	"strconv"
@@ -46,21 +45,10 @@ func RegexpCompile(pattern string) (*regexp.Regexp, error) {
 	return reg, err
 }
 
-// Md5 Pool
-var md5Pool = &sync.Pool{
-	New: func() any {
-		return md5.New()
-	},
-}
-
 // MD5 计算字符串的md5
 func MD5(source string) string {
-	var m = md5Pool.Get().(hash.Hash)
-	m.Write([]byte(source))
-	var result = hex.EncodeToString(m.Sum(nil))
-	m.Reset()
-	md5Pool.Put(m)
-	return result
+	var h = md5.Sum([]byte(source))
+	return hex.EncodeToString(h[:])
 }
 
 // Rand 取得随机字符串
