@@ -3,16 +3,16 @@ package assert
 import (
 	"bytes"
 	"fmt"
-	"github.com/tjbrains/TeaGo/types"
-	stringutil "github.com/tjbrains/TeaGo/utils/string"
 	"os"
-	"path/filepath"
 	"reflect"
 	"regexp"
 	"runtime"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/tjbrains/TeaGo/types"
+	stringutil "github.com/tjbrains/TeaGo/utils/string"
 )
 
 // Assertion 断言定义
@@ -147,7 +147,7 @@ func (this *Assertion) IsNumber(value any, msg ...any) *Assertion {
 }
 
 // IsNaN 检查是否为非数字
-func (this *Assertion) IsNaN(value interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) IsNaN(value any, msg ...any) *Assertion {
 	if !types.IsNumber(value) {
 		this.Pass(msg...)
 	} else {
@@ -158,7 +158,7 @@ func (this *Assertion) IsNaN(value interface{}, msg ...interface{}) *Assertion {
 }
 
 // Equals 检查是否相等
-func (this *Assertion) Equals(value1 interface{}, value2 interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) Equals(value1 any, value2 any, msg ...any) *Assertion {
 	if value1 == value2 {
 		this.Pass(msg...)
 	} else {
@@ -168,7 +168,7 @@ func (this *Assertion) Equals(value1 interface{}, value2 interface{}, msg ...int
 }
 
 // NotEquals 检查是否不相等
-func (this *Assertion) NotEquals(value1 interface{}, value2 interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) NotEquals(value1 any, value2 any, msg ...any) *Assertion {
 	if value1 != value2 {
 		this.Pass(msg...)
 	} else {
@@ -178,7 +178,7 @@ func (this *Assertion) NotEquals(value1 interface{}, value2 interface{}, msg ...
 }
 
 // Contains 检查是否包含某个条目，目前只支持slice
-func (this *Assertion) Contains(container interface{}, item interface{}, msg ...interface{}) *Assertion {
+func (this *Assertion) Contains(container any, item any, msg ...any) *Assertion {
 	if container == nil {
 		this.Fail("'container' should not be nil")
 		return this
@@ -228,7 +228,7 @@ func (this *Assertion) Match(pattern string, value string, msg ...any) *Assertio
 }
 
 // IsKind 检查类型
-func (this *Assertion) IsKind(value interface{}, kind reflect.Kind, msg ...any) *Assertion {
+func (this *Assertion) IsKind(value any, kind reflect.Kind, msg ...any) *Assertion {
 	v := reflect.TypeOf(value)
 	if v == nil {
 		this.Fail(msg...)
@@ -245,7 +245,7 @@ func (this *Assertion) IsKind(value interface{}, kind reflect.Kind, msg ...any) 
 }
 
 // IsBool 检查是否为bool类型
-func (this *Assertion) IsBool(value interface{}, msg ...any) *Assertion {
+func (this *Assertion) IsBool(value any, msg ...any) *Assertion {
 	return this.IsKind(value, reflect.Bool, msg...)
 }
 
@@ -638,13 +638,6 @@ func (this *Assertion) output(tag string, msg ...any) *Assertion {
 				}
 			}
 		}
-	}
-
-	goPath := os.Getenv("GOPATH")
-	goAbsPath, err := filepath.Abs(goPath)
-	if err == nil {
-		goPath = goAbsPath
-		filename = strings.TrimPrefix(filename, goAbsPath)[1:]
 	}
 
 	if len(msg) > 0 {
