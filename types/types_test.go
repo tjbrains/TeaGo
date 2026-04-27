@@ -2,11 +2,12 @@ package types_test
 
 import (
 	"fmt"
-	"github.com/tjbrains/TeaGo/types"
 	"math"
 	"reflect"
 	"runtime"
 	"testing"
+
+	"github.com/tjbrains/TeaGo/types"
 )
 
 func TestConvert(t *testing.T) {
@@ -90,6 +91,12 @@ func TestString(t *testing.T) {
 	t.Log(types.String(float64(12345)))
 	t.Log(types.String(float32(12345)))
 	t.Log(types.String(12345.12345))
+	t.Log(types.String(math.Pi), types.String(math.E))
+	t.Log(types.String([]byte("Hello")))
+	t.Log(types.String([]rune("World")))
+	t.Log(types.String(true))
+	t.Log(types.String(false))
+	t.Log(types.Int8(12))
 }
 
 func TestIsSlice(t *testing.T) {

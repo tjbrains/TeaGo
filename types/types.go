@@ -6,7 +6,6 @@ import (
 	"math"
 	"reflect"
 	"strconv"
-	"strings"
 )
 
 // Byte 将值转换成byte
@@ -1110,10 +1109,11 @@ func String(value any) string {
 	case int8, int16, int32, uint, uint8, uint16, uint32:
 		return fmt.Sprintf("%d", x)
 	case float32, float64:
-		// 避免整型在JSON转换中平白无故多了尾部的0
-		return strings.TrimSuffix(fmt.Sprintf("%f", x), ".000000")
+		return fmt.Sprintf("%g", x)
 	case []byte:
-		return string(value.([]byte))
+		return string(x)
+	case []rune:
+		return string(x)
 	case string:
 		return x
 	}

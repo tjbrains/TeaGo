@@ -1,9 +1,10 @@
 package timeutil_test
 
 import (
-	timeutil "github.com/tjbrains/TeaGo/utils/time"
 	"testing"
 	"time"
+
+	timeutil "github.com/tjbrains/TeaGo/utils/time"
 )
 
 func TestFormat(t *testing.T) {
@@ -30,7 +31,12 @@ func TestFormat(t *testing.T) {
 }
 
 func BenchmarkFormat(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		timeutil.Format("Y-m-d H:i:s")
-	}
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			timeutil.Format("Y-m-d H:i:s")
+		}
+	})
 }
