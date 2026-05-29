@@ -435,6 +435,7 @@ func TestQueryReplace(t *testing.T) {
 
 func TestQueryInsertOrUpdate(t *testing.T) {
 	var query = setupUserQuery(t)
+	query.Debug(true)
 	var inserting = map[string]any{
 		"id":   8273,
 		"name": "李白",

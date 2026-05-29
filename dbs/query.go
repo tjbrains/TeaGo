@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/k0kubun/pp/v3"
 	"github.com/tjbrains/TeaGo/lists"
 	"github.com/tjbrains/TeaGo/logs"
 	"github.com/tjbrains/TeaGo/maps"
@@ -695,6 +696,19 @@ func (this *Query) SetFields(values *FieldValues[any]) *Query {
 	return this
 }
 
+func (this *Query) ReplaceFields(values *FieldValues[any]) *Query {
+	if this.replacingFields.Len() == 0 {
+		for field, value := range values.Iterator() {
+			this.replacingFields.Append(field, this.wrapValue(value))
+		}
+	} else {
+		for field, value := range values.Iterator() {
+			this.replacingFields.Set(field, this.wrapValue(value))
+		}
+	}
+	return this
+}
+
 // Param 设定查询语句中的参数值
 // 只有指定where和sql后，才能使用该方法
 func (this *Query) Param(name string, value any) *Query {
@@ -944,11 +958,14 @@ func (this *Query) AsSQL() (string, error) {
 				var fieldNames = make([]string, 0, this.savingFields.Len())
 				var fieldValues = make([]string, 0, this.savingFields.Len())
 				this.savingFields.SortKeys()
+				var l int
 				for field, value := range this.savingFields.Iterator() {
 					var w = this.wrapKeyword(field)
 					fieldNames = append(fieldNames, w)
 					fieldValues = append(fieldValues, value)
+					l += len(w) + len(value) + 4
 				}
+				this.builder.Grow(l + 16)
 				_, _ = this.builder.WriteString(" (")
 				_, _ = this.builder.WriteString(strings.Join(fieldNames, ", "))
 				_, _ = this.builder.WriteString(") VALUES (")
@@ -961,9 +978,13 @@ func (this *Query) AsSQL() (string, error) {
 			if this.replacingFields.Len() > 0 {
 				var mapping = make([]string, 0, this.replacingFields.Len())
 				this.replacingFields.SortKeys()
+				var l int
 				for field, value := range this.replacingFields.Iterator() {
-					mapping = append(mapping, this.wrapKeyword(field)+"="+value)
+					var w = this.wrapKeyword(field)
+					mapping = append(mapping, w+"="+value)
+					l += len(w) + 1 + len(value) + 2
 				}
+				this.builder.Grow(l)
 				_, _ = this.builder.WriteString(strings.Join(mapping, ", "))
 			}
 		}
@@ -1090,8 +1111,8 @@ func (this *Query) AsSQL() (string, error) {
 
 	// debug
 	if this.debug {
-		logs.Debugf("%s", "SQL:"+this.builder.String())
-		logs.Debugf("params:%#v", this.namedParams)
+		logs.Debugf("SQL: %s", this.builder.String())
+		_, _ = pp.Printf("Params: %v", this.namedParams)
 	}
 
 	return resultSQL, nil
@@ -1820,11 +1841,15 @@ func (this *Query) InsertOrUpdate(insertingValues maps.Map, updatingValues maps.
 		return rows, 0, err
 	}
 
-	if lastId > 0 {
-		err = this.dao.NotifyInsert()
-	} else {
-		err = this.dao.NotifyUpdate()
+	if this.dao != nil {
+		if lastId > 0 {
+			err = this.dao.NotifyInsert()
+		} else {
+			err = this.dao.NotifyUpdate()
+		}
 	}
+
+	this.Close()
 
 	return rows, lastId, err
 }
