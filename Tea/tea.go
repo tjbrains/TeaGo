@@ -1,12 +1,13 @@
 package Tea
 
 import (
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/utils/string"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/tjbrains/TeaGo/logs"
+	stringutil "github.com/tjbrains/TeaGo/utils/string"
 )
 
 const (
@@ -149,7 +150,7 @@ func ConfigFile(file string) string {
 
 func findRoot() string {
 	// TEAROOT变量
-	root := strings.TrimSpace(os.Getenv("TEAROOT"))
+	var root = strings.TrimSpace(os.Getenv("TEAROOT"))
 	if len(root) > 0 {
 		abs, err := filepath.Abs(root)
 		if err != nil {

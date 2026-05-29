@@ -2,17 +2,17 @@ package dbs_test
 
 import (
 	"encoding/json"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/tjbrains/TeaGo/assert"
-	"github.com/tjbrains/TeaGo/dbs"
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/types"
-	stringutil "github.com/tjbrains/TeaGo/utils/string"
-	"github.com/tjbrains/TeaGo/utils/time"
 	"reflect"
 	"regexp"
 	"testing"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/tjbrains/TeaGo/assert"
+	"github.com/tjbrains/TeaGo/dbs"
+	"github.com/tjbrains/TeaGo/types"
+	stringutil "github.com/tjbrains/TeaGo/utils/string"
+	timeutil "github.com/tjbrains/TeaGo/utils/time"
 )
 
 type TestUser struct {
@@ -139,7 +139,7 @@ func TestQuery_ExceptResult(t *testing.T) {
 func TestQuery_FindOnes(t *testing.T) {
 	var now = time.Now()
 
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	query.Debug(true)
 
 	query.Offset(0)
@@ -153,7 +153,7 @@ func TestQuery_FindOnes(t *testing.T) {
 
 	//query.State(1)
 	//query.Attr("state", 1)
-	//query.Attr("name", "刘祥超")
+	//query.Attr("name", "Lily")
 	//query.Like("name", "张三")
 
 	//query.SQLCache(QUERY_SQL_CACHE_OFF)
@@ -165,7 +165,7 @@ func TestQuery_FindOnes(t *testing.T) {
 		"state": 1,
 	})**/
 	query.Pk(1, 2, 3, 100)
-	//query.Attr("name", []string{ "行行行店铺", "张三", "刘祥超" })
+	//query.Attr("name", []string{ "行行行店铺", "张三", "Lily" })
 	//query.Attr("name", SQL("'abc'"))
 
 	//query.Order("id", QUERY_ORDER_DESC)
@@ -200,7 +200,7 @@ func TestQuery_FindOnes(t *testing.T) {
 }
 
 func TestQuery_FindOne(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	query.Debug(false)
 
 	query.Result("id", "name", "gender", "state")
@@ -216,8 +216,8 @@ func TestQuery_FindOne(t *testing.T) {
 }
 
 func TestQuery_FindCol(t *testing.T) {
-	var query = setupUserQuery()
-	//query.Attr("name", "刘祥超")
+	var query = setupUserQuery(t)
+	//query.Attr("name", "Lily")
 	//query.ResultPk()
 	query.Result("name", "gender")
 
@@ -230,20 +230,20 @@ func TestQuery_FindCol(t *testing.T) {
 }
 
 func TestQuery_Exist(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	query.Where("id>100")
 	t.Log(query.Exist())
 }
 
 func TestQuery_Count(t *testing.T) {
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		query.Where("id>100 AND id<200")
 		t.Log(query.Count())
 	}
 
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		query.Where("id>100 AND id<2000")
 		t.Log(query.CountAttr("DISTINCT state"))
 	}
@@ -251,13 +251,13 @@ func TestQuery_Count(t *testing.T) {
 
 func TestQuery_Sum(t *testing.T) {
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		query.Where("id>100 AND id<200")
 		t.Log(query.Sum("id", 0))
 	}
 
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		query.Where("id=2000000")
 		t.Log(query.Sum("id", 0))
 	}
@@ -265,13 +265,13 @@ func TestQuery_Sum(t *testing.T) {
 
 func TestQuery_Min(t *testing.T) {
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		query.Where("id>100 AND id<200")
 		t.Log(query.Min("id", 0))
 	}
 
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		query.Where("id=2000000")
 		t.Log(query.Min("id", 10))
 	}
@@ -279,13 +279,13 @@ func TestQuery_Min(t *testing.T) {
 
 func TestQuery_Max(t *testing.T) {
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		query.Where("id>100 AND id<200")
 		t.Log(query.Max("id", 0))
 	}
 
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		query.Where("id=2000000")
 		t.Log(query.Max("id", 10))
 	}
@@ -293,20 +293,20 @@ func TestQuery_Max(t *testing.T) {
 
 func TestQuery_Avg(t *testing.T) {
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		query.Where("id>100 AND id<200")
 		t.Log(query.Avg("id", 0))
 	}
 
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		query.Where("id=2000000")
 		t.Log(query.Avg("id", 10))
 	}
 }
 
 func TestQuery_FindAll(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	query.Where("id>300 AND id<5000")
 	query.Limit(5)
 
@@ -321,7 +321,7 @@ func TestQuery_FindAll(t *testing.T) {
 }
 
 func TestQuery_Find(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	query.Where("id=1024")
 	//query.Reuse(false)
 	//query.Attr("id", 1024)
@@ -336,7 +336,7 @@ func TestQuery_Find(t *testing.T) {
 }
 
 func TestQuery_Exec(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	query.SQL("UPDATE `users` SET password='1234567' WHERE id=:userId").
 		Param("userId", 1024)
 
@@ -353,27 +353,27 @@ func TestQuery_Exec(t *testing.T) {
 }
 
 func TestQuery_Delete(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	query.Attr("id", 8270)
 	t.Log(query.Delete())
 }
 
 func TestQueryInsert(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	query.Set("name", "张三")
 	query.Set("birthday", "1999-10-10")
 	t.Log(query.Insert())
 }
 
 func TestQueryUpdate(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	query.Attr("id", 8271)
 	query.Set("mobile", "13800001234")
 	t.Log(query.Update())
 }
 
 func TestQueryReplace(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	query.Sets(map[string]any{
 		"id":  8272,
 		"tel": "010-8888888",
@@ -382,7 +382,7 @@ func TestQueryReplace(t *testing.T) {
 }
 
 func TestQueryInsertOrUpdate(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	var inserting = map[string]any{
 		"id":   8273,
 		"name": "李白",
@@ -397,7 +397,7 @@ func TestQueryInsertOrUpdate(t *testing.T) {
 }
 
 func TestQueryJoin(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	var dao = dbs.NewDAO(&TestDbDAO{
 		DAOObject: dbs.DAOObject{
 			DB:     "db1",
@@ -439,7 +439,7 @@ func TestQueryJoin(t *testing.T) {
 }
 
 func TestQuery_UseIndex(t *testing.T) {
-	query := setupUserQuery()
+	query := setupUserQuery(t)
 	query.UseIndex("a", "b")
 	query.UseIndex("c").For(dbs.QueryForOrderBy)
 	query.UseIndex()
@@ -449,58 +449,58 @@ func TestQuery_UseIndex(t *testing.T) {
 }
 
 func TestQuery_UseIndex2(t *testing.T) {
-	query := setupUserQuery()
+	query := setupUserQuery(t)
 	query.UseIndex("id")
 	t.Log(query.AsSQL())
 }
 
 func TestFuncAbs(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	t.Log(query.Result(dbs.FuncAbs(dbs.SQL("id"))).DescPk().FindCol(0))
 }
 
 func TestFuncRand(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	t.Log(query.Result(dbs.FuncRand()).FindCol(0))
 }
 
 func TestFuncFindInSet(t *testing.T) {
-	var query = setupUserQuery()
+	var query = setupUserQuery(t)
 	t.Log(query.Result(dbs.FuncFindInSet(dbs.SQL("id"), "1,2,3")).Pk(4).FindCol(0))
 }
 
 func TestFuncFromUnixtime(t *testing.T) {
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		t.Log(query.Result(dbs.FuncFromUnixtime(dbs.SQL("createdAt"))).Pk(4).FindCol(0))
 	}
 
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		t.Log(query.Result(dbs.FuncFromUnixtimeFormat(dbs.SQL("createdAt"), "%Y-%m-%d")).Pk(4).FindCol(0))
 	}
 }
 
 func TestFuncConcat(t *testing.T) {
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		t.Log(query.Result(dbs.FuncConcat(dbs.SQL("id"), ":", "1", ",", 2, ",", 3.5)).Pk(4).FindCol(0))
 	}
 
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		t.Log(query.Result(dbs.FuncConcat(1)).Pk(4).FindCol(0))
 	}
 
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		t.Log(query.Result(dbs.FuncConcatWs(", ", dbs.SQL("id"), "1", 2, 3.5)).Pk(4).FindCol(0))
 	}
 }
 
 func TestFuncLpad(t *testing.T) {
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(t)
 		t.Log(query.Result(dbs.FuncLpad("a", "10", 0)).Pk(4).FindCol(0))
 	}
 }
@@ -518,27 +518,30 @@ func TestIsKeyword(t *testing.T) {
 	a.IsFalse(query.IsKeyword("  "))
 }
 
-// old 5500 ns/op -> new 3700
+// old 1375 ns/op -> new 1083
 func BenchmarkQuery_AsSQL(b *testing.B) {
 	var sqlCacheMap = dbs.TestSQLCacheMap()
 
-	for i := 0; i < 90_000; i++ {
+	for i := range 90_000 {
 		sqlCacheMap["sql"+types.String(i)] = map[string]any{}
 	}
 
+	b.ReportAllocs()
 	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
-		var query = dbs.NewQuery(nil)
+	var query = dbs.NewQuery(nil)
+
+	for i := range b.N {
 		query.Table("users" + types.String(i%1024))
 		query.DB(&dbs.DB{})
 		query.Action(dbs.QueryActionFind)
 		query.Attr("name", "lily")
 		query.Attr("age", 20)
 		query.Attr("id", 123)
-		//query.Offset(0)
-		//query.Limit(10)
+		query.Offset(0)
+		query.Limit(10)
 		_, _ = query.AsSQL()
+		query.Close(nil)
 	}
 }
 
@@ -604,7 +607,7 @@ func BenchmarkQuery_isKeyword(b *testing.B) {
 
 func BenchmarkQuery_FindOne(b *testing.B) {
 	{
-		var query = setupUserQuery()
+		var query = setupUserQuery(b)
 		query.Debug(false)
 
 		query.Result("id", "name", "gender", "state")
@@ -621,7 +624,7 @@ func BenchmarkQuery_FindOne(b *testing.B) {
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			var query = setupUserQuery()
+			var query = setupUserQuery(b)
 			query.Debug(false)
 
 			query.Result("id", "name", "gender", "state")
@@ -658,7 +661,7 @@ func BenchmarkQuery_FindOne_DB(b *testing.B) {
 }
 
 func BenchmarkQuery_Exec(b *testing.B) {
-	setupUserQuery()
+	setupUserQuery(b)
 
 	b.ResetTimer()
 
@@ -684,7 +687,11 @@ func BenchmarkQuery_Exec(b *testing.B) {
 
 var testDBInstance *dbs.DB
 
-func setupUserQuery() *dbs.Query {
+type fatalPrinter interface {
+	Fatal(args ...any)
+}
+
+func setupUserQuery(p fatalPrinter) *dbs.Query {
 	if testDBInstance == nil {
 		db, err := dbs.NewInstanceFromConfig(&dbs.DBConfig{
 			Driver: "mysql",
@@ -701,7 +708,7 @@ func setupUserQuery() *dbs.Query {
 			}{Pool: 128, Max: 1000},
 		})
 		if err != nil {
-			logs.Errorf(err.Error())
+			p.Fatal(err)
 		}
 		testDBInstance = db
 	}

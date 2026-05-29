@@ -2,9 +2,10 @@ package maps
 
 import (
 	"cmp"
+	"slices"
+
 	"github.com/tjbrains/TeaGo/lists"
 	"github.com/tjbrains/TeaGo/types"
-	"slices"
 )
 
 type OrderedMap[K cmp.Ordered, V any] struct {
@@ -35,7 +36,7 @@ func (this *OrderedMap[K, V]) Sort() {
 
 // SortKeys 根据Key进行排序
 func (this *OrderedMap[K, V]) SortKeys() {
-	slices.Sort[[]K, K](this.keys)
+	slices.Sort(this.keys)
 }
 
 // Reverse 翻转键
@@ -83,4 +84,14 @@ func (this *OrderedMap[K, V]) Range(iterator func(key K, value V)) {
 // Len 取得Map的长度
 func (this *OrderedMap[K, V]) Len() int {
 	return len(this.keys)
+}
+
+// Reset 重置数据
+func (this *OrderedMap[K, V]) Reset() {
+	this.keys = this.keys[:0]
+	if len(this.valuesMap) > 0 {
+		for k := range this.valuesMap {
+			delete(this.valuesMap, k)
+		}
+	}
 }

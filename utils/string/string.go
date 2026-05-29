@@ -6,12 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/tjbrains/TeaGo/rands"
 	"math"
 	"regexp"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/tjbrains/TeaGo/rands"
 )
 
 var reuseRegexpMap = map[string]*regexp.Regexp{}

@@ -3,13 +3,14 @@
 package dbs_test
 
 import (
+	"testing"
+
 	"github.com/tjbrains/TeaGo/dbs"
 	"github.com/tjbrains/TeaGo/rands"
-	"testing"
 )
 
 func TestRows_Columns(t *testing.T) {
-	setupUserQuery()
+	setupUserQuery(t)
 
 	stmt, err := testDBInstance.Prepare("SELECT * FROM users")
 	if err != nil {
@@ -32,7 +33,7 @@ func TestRows_Columns(t *testing.T) {
 }
 
 func BenchmarkRows_Columns(b *testing.B) {
-	setupUserQuery()
+	setupUserQuery(b)
 
 	stmt, err := testDBInstance.Prepare("SELECT * FROM users")
 	if err != nil {
@@ -60,7 +61,7 @@ func BenchmarkRows_Columns(b *testing.B) {
 }
 
 func BenchmarkRows_FindOnes(b *testing.B) {
-	setupUserQuery()
+	setupUserQuery(b)
 
 	const count = 1
 

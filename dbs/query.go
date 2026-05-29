@@ -4,15 +4,16 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/tjbrains/TeaGo/lists"
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/maps"
-	"github.com/tjbrains/TeaGo/types"
-	"github.com/tjbrains/TeaGo/utils/string"
 	"reflect"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/tjbrains/TeaGo/lists"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/maps"
+	"github.com/tjbrains/TeaGo/types"
+	stringutil "github.com/tjbrains/TeaGo/utils/string"
 )
 
 type QueryAction = int
@@ -158,7 +159,12 @@ func NewQuery(model any) *Query {
 
 func (this *Query) init(model any) *Query {
 	if model != nil {
-		this.model = NewModel(model)
+		commonModel, ok := model.(*Model)
+		if ok {
+			this.model = commonModel
+		} else {
+			this.model = NewModel(model)
+		}
 	}
 
 	this.canReuse = true
@@ -173,15 +179,61 @@ func (this *Query) init(model any) *Query {
 	this.offset = -1
 	this.debug = false
 
-	this.attrs = maps.NewOrderedMap[string, string]()
-	this.savingFields = maps.NewOrderedMap[string, string]()
-	this.replacingFields = maps.NewOrderedMap[string, string]()
+	if this.attrs != nil {
+		this.attrs.Reset()
+	} else {
+		this.attrs = maps.NewOrderedMap[string, string]()
+	}
 
-	this.namedParams = map[string]any{}
+	if this.savingFields != nil {
+		this.savingFields.Reset()
+	} else {
+		this.savingFields = maps.NewOrderedMap[string, string]()
+	}
+
+	if this.replacingFields != nil {
+		this.replacingFields.Reset()
+	} else {
+		this.replacingFields = maps.NewOrderedMap[string, string]()
+	}
+
+	if this.namedParams != nil {
+		for k := range this.namedParams {
+			delete(this.namedParams, k)
+		}
+	} else {
+		this.namedParams = map[string]any{}
+	}
+
 	this.namedParamIndex = 0
 
 	this.namedParamPrefix = ""
 
+	return this
+}
+
+func (this *Query) Close(model any) *Query {
+	var oldAttrs = this.attrs
+	var oldSavingFields = this.savingFields
+	var oldReplacingFields = this.replacingFields
+	var oldParams = this.params
+	var oldNamedParams = this.namedParams
+	var oldWheres = this.wheres
+	var orders = this.orders
+	var oldResults = this.results
+
+	*this = Query{}
+
+	this.attrs = oldAttrs
+	this.savingFields = oldSavingFields
+	this.replacingFields = oldReplacingFields
+	this.params = oldParams[:0]
+	this.namedParams = oldNamedParams
+	this.wheres = oldWheres[:0]
+	this.orders = orders[:0]
+	this.results = oldResults[:0]
+
+	this.init(model)
 	return this
 }
 
@@ -791,7 +843,10 @@ func (this *Query) AsSQL() (string, error) {
 	}
 
 	// attrs
-	var wheres = []string{}
+	var wheres []string
+	if this.attrs.Len()+len(this.wheres) > 0 {
+		wheres = make([]string, 0, this.attrs.Len()+len(this.wheres))
+	}
 	if this.attrs.Len() > 0 {
 		this.attrs.Range(func(_ string, placeholder string) {
 			wheres = append(wheres, placeholder)
@@ -822,7 +877,7 @@ func (this *Query) AsSQL() (string, error) {
 
 	// orders
 	if len(this.orders) > 0 {
-		var orderStrings = []string{}
+		var orderStrings = make([]string, 0, len(this.orders))
 		for _, order := range this.orders {
 			var fieldString string
 			if _, ok := order.Field.(string); ok {
@@ -847,10 +902,10 @@ func (this *Query) AsSQL() (string, error) {
 			if this.offset > -1 {
 				offsetValue, _ := this.WrapAttr(this.offset)
 				limitValue, _ := this.WrapAttr(this.limit)
-				sqlString += "\n LIMIT " + types.String(offsetValue) + ", " + types.String(limitValue)
+				sqlString += "\n LIMIT " + offsetValue + ", " + limitValue
 			} else {
 				limitValue, _ := this.WrapAttr(this.limit)
-				sqlString += "\n LIMIT " + types.String(limitValue)
+				sqlString += "\n LIMIT " + limitValue
 			}
 		}
 	}
@@ -878,13 +933,13 @@ func (this *Query) AsSQL() (string, error) {
 	// 处理:NamedParam
 	var resultSQL = sqlString
 	if !this.isSub {
-		this.params = []any{}
+		this.params = this.params[:0]
 		resultSQL = this.parsePlaceholders(sqlString)
 	}
 
 	// debug
 	if this.debug {
-		logs.Debugf("SQL:" + sqlString)
+		logs.Debugf("%s", "SQL:"+sqlString)
 		logs.Debugf("params:%#v", this.namedParams)
 	}
 
@@ -1712,7 +1767,7 @@ func (this *Query) WrapAttr(value any) (placeholder string, isArray bool) {
 		var params = []string{}
 		var reflectValue = reflect.ValueOf(value)
 		var countElements = reflectValue.Len()
-		for i := 0; i < countElements; i++ {
+		for i := range countElements {
 			var v, _ = this.WrapAttr(reflectValue.Index(i).Interface())
 			params = append(params, v)
 		}
@@ -1785,7 +1840,7 @@ func (this *Query) wrapKeyword(keyword string) string {
 // 关键词包装
 func (this *Query) wrapTable(keyword string) string {
 	if this.db == nil {
-		logs.Errorf("[Query.wrapKeyword()]query.db should be not nil")
+		logs.Errorf("%s", "[Query.wrapKeyword()]query.db should be not nil")
 		return "\"" + keyword + "\""
 	}
 	if !this.IsKeyword(keyword) {
@@ -1885,7 +1940,8 @@ func (this *Query) TestNameParams() map[string]any {
 
 // 分析语句中的占位
 func (this *Query) parsePlaceholders(sqlString string) string {
-	if len(sqlString) < 1024 {
+	var shouldCache = len(sqlString) < 1024
+	if shouldCache {
 		sqlCacheLocker.RLock()
 		cache, ok := sqlCacheMap[sqlString]
 		if ok {
@@ -1955,7 +2011,7 @@ func (this *Query) parsePlaceholders(sqlString string) string {
 		}
 	}
 
-	if len(sqlString) < 1024 {
+	if shouldCache {
 		sqlCacheLocker.Lock()
 
 		// 防止过载

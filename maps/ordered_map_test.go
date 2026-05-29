@@ -1,8 +1,9 @@
 package maps_test
 
 import (
-	"github.com/tjbrains/TeaGo/maps"
 	"testing"
+
+	"github.com/tjbrains/TeaGo/maps"
 )
 
 func TestNewOrderedMap(t *testing.T) {
@@ -79,6 +80,21 @@ func TestOrderedMap_Reverse(t *testing.T) {
 func BenchmarkOrderedMap_SortKeys(b *testing.B) {
 	for range b.N {
 		var om = maps.NewOrderedMap[string, string]()
+		om.Put("Name1", "Zhang San")
+		om.Put("Name2", "Li Si")
+		om.Put("Name3", "Wang Er")
+		om.Put("Name3", "Wang Er 2")
+		om.Put("Name4", "Ma Zi")
+
+		om.SortKeys()
+	}
+}
+
+func BenchmarkOrderedMap_SortKeys_Pool(b *testing.B) {
+	var om = maps.NewOrderedMap[string, string]()
+
+	for range b.N {
+		om.Reset()
 		om.Put("Name1", "Zhang San")
 		om.Put("Name2", "Li Si")
 		om.Put("Name3", "Wang Er")

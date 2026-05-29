@@ -3,17 +3,18 @@ package dbs
 import (
 	"database/sql"
 	"errors"
-	"github.com/tjbrains/TeaGo/Tea"
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/maps"
-	"github.com/tjbrains/TeaGo/types"
-	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/maps"
+	"github.com/tjbrains/TeaGo/types"
+	"gopkg.in/yaml.v3"
 )
 
 type DB struct {
@@ -149,7 +150,7 @@ func loadConfig() {
 		}
 
 		if !found {
-			logs.Errorf("[DB]could not load database config file from '" + Tea.ConfigDir() + "'/[.db.yaml, db.yaml, db.conf]")
+			logs.Errorf("[DB]could not load database config file from '%s'/[.db.yaml, db.yaml, db.conf]", Tea.ConfigDir())
 			return
 		}
 
