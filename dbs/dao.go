@@ -3,10 +3,11 @@ package dbs
 import (
 	"errors"
 	"fmt"
-	"github.com/tjbrains/TeaGo/types"
 	"log"
 	"reflect"
 	"time"
+
+	"github.com/tjbrains/TeaGo/types"
 )
 
 type DAOObject struct {
@@ -103,7 +104,12 @@ func (this *DAOObject) Query(tx *Tx) *Query {
 		}
 	}
 
-	return NewQuery(this.Model).
+	var model = this.Model
+	if this.modelWrapper != nil {
+		model = this.modelWrapper
+	}
+
+	return NewQuery(model).
 		DB(db).
 		Tx(tx).
 		Table(this.Table).

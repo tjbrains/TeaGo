@@ -3,12 +3,13 @@ package dbs_test
 import (
 	"encoding/json"
 	"fmt"
-	_ "github.com/tjbrains/TeaGo/bootstrap"
-	"github.com/tjbrains/TeaGo/dbs"
-	"github.com/tjbrains/TeaGo/maps"
 	"log"
 	"testing"
 	"time"
+
+	_ "github.com/tjbrains/TeaGo/bootstrap"
+	"github.com/tjbrains/TeaGo/dbs"
+	"github.com/tjbrains/TeaGo/maps"
 )
 
 type UserDAO dbs.DAO
@@ -43,7 +44,7 @@ func NewUserDAO() *UserDAO {
 	return dbs.NewDAO(&UserDAO{
 		dbs.DAOObject{
 			DB:     "dev",
-			Table:  "pp_users",
+			Table:  "users",
 			Model:  new(User),
 			PkName: "id",
 		},

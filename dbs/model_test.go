@@ -1,7 +1,6 @@
 package dbs
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -15,5 +14,22 @@ func TestMakeModel(t *testing.T) {
 	}
 
 	var model = NewModel(new(User))
-	t.Log(fmt.Sprintf("%#v", model))
+	t.Logf("%#v", model)
+}
+
+func BenchmarkModel_New(b *testing.B) {
+	type User struct {
+		Id        int `field:"id"`
+		Gender    int
+		Age       int
+		Nickname  string
+		CreatedAt int `field:"created_at"`
+	}
+
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for b.Loop() {
+		_ = NewModel(new(User))
+	}
 }
