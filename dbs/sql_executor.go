@@ -2,6 +2,8 @@ package dbs
 
 import (
 	"database/sql"
+	"iter"
+
 	"github.com/tjbrains/TeaGo/maps"
 )
 
@@ -12,4 +14,6 @@ type SQLExecutor interface {
 	Exec(query string, args ...any) (result sql.Result, err error)
 
 	FindOnes(query string, args ...any) (ones []maps.Map, columnNames []string, err error)
+
+	FindOnesSeq(query string, args ...any) (seq iter.Seq[maps.Map], columnNames []string, err error)
 }

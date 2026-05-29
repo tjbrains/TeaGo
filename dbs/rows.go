@@ -5,6 +5,8 @@ package dbs
 import (
 	"database/sql"
 	"errors"
+	"iter"
+
 	"github.com/tjbrains/TeaGo/maps"
 	"github.com/tjbrains/TeaGo/types"
 )
@@ -72,6 +74,58 @@ func (this *Rows) FindOnes() (ones []maps.Map, err error) {
 		}
 
 		ones = append(ones, rowMap)
+	}
+
+	// retrieve error in iteration
+	err = this.rawRows.Err()
+
+	return
+}
+
+func (this *Rows) FindOnesSeq() (seq iter.Seq[maps.Map], err error) {
+	var columnNames []string
+	columnNames, err = this.Columns()
+	if err != nil {
+		return
+	}
+
+	var countColumns = len(columnNames)
+	var valuePointers = []any{}
+	for range countColumns {
+		var v any
+		valuePointers = append(valuePointers, &v)
+	}
+
+	seq = iter.Seq[maps.Map](func(yield func(m maps.Map) bool) {
+		for this.rawRows.Next() {
+			err = this.rawRows.Scan(valuePointers...)
+			if err != nil {
+				return
+			}
+
+			var rowMap = maps.Map{}
+			for i := range countColumns {
+				var pointer = valuePointers[i]
+				var value = *(pointer.(*any))
+
+				if value != nil {
+					v, isBytes := value.([]byte)
+					if isBytes {
+						value = string(v)
+					}
+				}
+
+				rowMap[columnNames[i]] = value
+			}
+
+			if !yield(rowMap) {
+				return
+			}
+		}
+	})
+
+	if err != nil {
+		return
 	}
 
 	// retrieve error in iteration

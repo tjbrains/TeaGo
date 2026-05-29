@@ -10,6 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/tjbrains/TeaGo/assert"
 	"github.com/tjbrains/TeaGo/dbs"
+	"github.com/tjbrains/TeaGo/maps"
 	"github.com/tjbrains/TeaGo/types"
 	stringutil "github.com/tjbrains/TeaGo/utils/string"
 	timeutil "github.com/tjbrains/TeaGo/utils/time"
@@ -199,6 +200,39 @@ func TestQuery_FindOnes(t *testing.T) {
 	t.Log(float64(time.Since(now).Nanoseconds()) / 1000000)
 }
 
+func TestQuery_FindOnesSeq(t *testing.T) {
+	var query = setupUserQuery(t)
+	query.Debug(true)
+
+	query.Offset(0)
+	query.Limit(10)
+
+	query.AscPk()
+	query.Action(dbs.QueryActionFind)
+	query.Debug(false)
+
+	// query.Filter(func(one maps.Map) bool {
+	// 	return one.GetInt64("id") > 1024
+	// })
+
+	seq, _, err := query.FindOnesSeq()
+	if err != nil {
+		sql, _ := query.AsSQL()
+		t.Fatal(err.Error() + "\nSQL:" + sql)
+	}
+
+	var results = []maps.Map{}
+	for v := range seq {
+		results = append(results, v)
+	}
+
+	jsonBytes, err := json.MarshalIndent(results, "", "    ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(jsonBytes))
+}
+
 func TestQuery_FindOne(t *testing.T) {
 	var query = setupUserQuery(t)
 	query.Debug(false)
@@ -320,6 +354,21 @@ func TestQuery_FindAll(t *testing.T) {
 	}
 }
 
+func TestQuery_FindAll_Seq(t *testing.T) {
+	var query = setupUserQuery(t)
+	query.Where("id>0 AND id<5000")
+	query.Limit(5)
+
+	var values, err = query.FindAllSeq()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for value := range values {
+		var user = value.(*TestUser)
+		t.Log("User:", user.ID, user.Name, user.Gender, user.CreatedDate())
+	}
+}
+
 func TestQuery_Find(t *testing.T) {
 	var query = setupUserQuery(t)
 	query.Where("id=1024")
@@ -359,10 +408,13 @@ func TestQuery_Delete(t *testing.T) {
 }
 
 func TestQueryInsert(t *testing.T) {
-	var query = setupUserQuery(t)
-	query.Set("name", "张三")
-	query.Set("birthday", "1999-10-10")
-	t.Log(query.Insert())
+	for range 2 {
+		var query = setupUserQuery(t)
+		t.Logf("query: %p", query)
+		query.Set("name", "张三")
+		query.Set("birthday", "1999-10-10")
+		t.Log(query.Insert())
+	}
 }
 
 func TestQueryUpdate(t *testing.T) {
@@ -518,20 +570,18 @@ func TestIsKeyword(t *testing.T) {
 	a.IsFalse(query.IsKeyword("  "))
 }
 
-// old 1375 ns/op -> new 1083
 func BenchmarkQuery_AsSQL(b *testing.B) {
 	var sqlCacheMap = dbs.TestSQLCacheMap()
 
 	for i := range 90_000 {
-		sqlCacheMap["sql"+types.String(i)] = map[string]any{}
+		sqlCacheMap["sql"+types.String(i)] = dbs.SQLCacheItem{}
 	}
 
 	b.ReportAllocs()
 	b.ResetTimer()
 
-	var query = dbs.NewQuery(nil)
-
 	for i := range b.N {
+		var query = dbs.NewQuery(nil)
 		query.Table("users" + types.String(i%1024))
 		query.DB(&dbs.DB{})
 		query.Action(dbs.QueryActionFind)
@@ -540,8 +590,48 @@ func BenchmarkQuery_AsSQL(b *testing.B) {
 		query.Attr("id", 123)
 		query.Offset(0)
 		query.Limit(10)
-		_, _ = query.AsSQL()
-		query.Close(nil)
+		query.DescPk()
+		sql, err := query.AsSQL()
+		if err != nil {
+			b.Fatal(err)
+		}
+		query.Close()
+
+		if i < 4 {
+			_ = sql
+			b.Log(sql)
+		}
+	}
+}
+
+func BenchmarkQuery_AsSQL_Insert(b *testing.B) {
+	var sqlCacheMap = dbs.TestSQLCacheMap()
+
+	for i := range 90_000 {
+		sqlCacheMap["sql"+types.String(i)] = dbs.SQLCacheItem{}
+	}
+
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for i := range b.N {
+		var query = dbs.NewQuery(nil)
+		query.Table("users" + types.String(i%1024))
+		query.DB(&dbs.DB{})
+		query.Action(dbs.QueryActionInsert)
+		query.Set("name", "lily")
+		query.Set("age", 20)
+		query.Set("id", 123)
+		sql, err := query.AsSQL()
+		if err != nil {
+			b.Fatal(err)
+		}
+		query.Close()
+
+		if i < 2 {
+			_ = sql
+			b.Log(sql)
+		}
 	}
 }
 
@@ -549,7 +639,7 @@ func BenchmarkQuery_AsSQL2(b *testing.B) {
 	var sqlCacheMap = dbs.TestSQLCacheMap()
 
 	for i := 0; i < 90_000; i++ {
-		sqlCacheMap["sql"+types.String(i)] = map[string]any{}
+		sqlCacheMap["sql"+types.String(i)] = dbs.SQLCacheItem{}
 	}
 
 	b.ResetTimer()

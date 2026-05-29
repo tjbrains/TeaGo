@@ -3,6 +3,7 @@ package dbs
 import (
 	"database/sql"
 	"errors"
+	"iter"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -362,6 +363,41 @@ func (this *DB) FindOnes(query string, args ...any) (ones []maps.Map, columnName
 	}
 
 	ones, err = rows.FindOnes()
+	return
+}
+
+func (this *DB) FindOnesSeq(query string, args ...any) (seq iter.Seq[maps.Map], columnNames []string, err error) {
+	rawRows, err := this.rawDB.Query(query, args...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var rows = NewRows(rawRows)
+
+	columnNames, err = rows.Columns()
+	if err != nil {
+		_ = rows.Close()
+		return
+	}
+
+	rowsSeq, err := rows.FindOnesSeq()
+	if err != nil {
+		_ = rows.Close()
+		return
+	}
+
+	seq = iter.Seq[maps.Map](func(yield func(v maps.Map) bool) {
+		defer func() {
+			_ = rows.Close()
+		}()
+
+		for v := range rowsSeq {
+			if !yield(v) {
+				return
+			}
+		}
+	})
+
 	return
 }
 

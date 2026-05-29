@@ -3,9 +3,11 @@ package dbs
 import (
 	"context"
 	"database/sql"
+	"iter"
+	"sync/atomic"
+
 	"github.com/tjbrains/TeaGo/logs"
 	"github.com/tjbrains/TeaGo/maps"
-	"sync/atomic"
 )
 
 var globalTxId int64 = 1
@@ -71,6 +73,41 @@ func (this *Tx) FindOnes(query string, args ...any) (ones []maps.Map, columnName
 	}
 
 	ones, err = rows.FindOnes()
+	return
+}
+
+func (this *Tx) FindOnesSeq(query string, args ...any) (seq iter.Seq[maps.Map], columnNames []string, err error) {
+	rawRows, err := this.rawTx.Query(query, args...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var rows = NewRows(rawRows)
+
+	columnNames, err = rows.Columns()
+	if err != nil {
+		_ = rows.Close()
+		return
+	}
+
+	rowsSeq, err := rows.FindOnesSeq()
+	if err != nil {
+		_ = rows.Close()
+		return
+	}
+
+	seq = iter.Seq[maps.Map](func(yield func(v maps.Map) bool) {
+		defer func() {
+			_ = rows.Close()
+		}()
+
+		for v := range rowsSeq {
+			if !yield(v) {
+				return
+			}
+		}
+	})
+
 	return
 }
 

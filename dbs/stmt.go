@@ -2,6 +2,8 @@ package dbs
 
 import (
 	"database/sql"
+	"iter"
+
 	"github.com/tjbrains/TeaGo/maps"
 )
 
@@ -55,6 +57,43 @@ func (this *Stmt) FindOnes(args ...any) (ones []maps.Map, columnNames []string, 
 	}
 
 	ones, err = rows.FindOnes()
+	return
+}
+
+func (this *Stmt) FindOnesSeq(args ...any) (seq iter.Seq[maps.Map], columnNames []string, err error) {
+	this.accessAt = unixTime()
+
+	rawRows, err := this.rawStmt.Query(args...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var rows = NewRows(rawRows)
+
+	columnNames, err = rows.Columns()
+	if err != nil {
+		_ = rows.Close()
+		return
+	}
+
+	rowsSeq, err := rows.FindOnesSeq()
+	if err != nil {
+		_ = rows.Close()
+		return
+	}
+
+	seq = iter.Seq[maps.Map](func(yield func(v maps.Map) bool) {
+		defer func() {
+			_ = rows.Close()
+		}()
+
+		for v := range rowsSeq {
+			if !yield(v) {
+				return
+			}
+		}
+	})
+
 	return
 }
 
