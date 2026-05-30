@@ -1,15 +1,17 @@
-// Copyright 2022 Liuxiangchao iwind.liu@gmail.com. All rights reserved.
+// Copyright 2026 FlexCDN root@flexcdn.cn. All rights reserved. Official site: https://flexcdn.cn .
 
 package dbs
 
 import (
 	"database/sql"
 	"errors"
-	"github.com/go-sql-driver/mysql"
-	"github.com/tjbrains/TeaGo/logs"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/go-sql-driver/mysql"
+	"github.com/tjbrains/TeaGo/containers"
+	"github.com/tjbrains/TeaGo/logs"
 )
 
 func IsPrepareError(err error) bool {
@@ -40,28 +42,31 @@ func unixTime() int64 {
 }
 
 type StmtManager struct {
-	stmtMap map[string]*Stmt   // query => *Stmt
-	subMap  map[int64][]string // id => [cache keys]
+	stmtMap map[string]*Stmt        // key => *Stmt
+	subMap  map[int64][]string      // id => [cache keys]
+	stmtLRU *containers.LRU[string] // key
 
-	maxCount int
-	locker   sync.RWMutex
+	mu sync.RWMutex
 
 	isClosed bool
 }
 
 func NewStmtManager() *StmtManager {
+	var maxCount = 1 << 10
 	var manager = &StmtManager{
-		stmtMap:  map[string]*Stmt{},
-		subMap:   map[int64][]string{},
-		maxCount: 1024,
+		stmtMap: map[string]*Stmt{},
+		stmtLRU: containers.NewLRU[string](maxCount, containers.LRURoundTouch[string]()),
+		subMap:  map[int64][]string{},
 	}
+
+	manager.stmtLRU.OnEvict(manager.onEvict)
 
 	return manager
 }
 
 func (this *StmtManager) SetMaxCount(count int) {
 	if count > 0 {
-		this.maxCount = count
+		this.stmtLRU.SetCapacity(count)
 	}
 }
 
@@ -79,9 +84,9 @@ func (this *StmtManager) Prepare(preparer sqlPreparer, querySQL string) (*Stmt, 
 	if err != nil {
 		if IsPrepareError(err) {
 			// lock for concurrent operation
-			this.locker.Lock()
+			this.mu.Lock()
 			this.purge()
-			this.locker.Unlock()
+			this.mu.Unlock()
 
 			// retry
 			sqlStmt, err = preparer.Prepare(querySQL)
@@ -104,14 +109,16 @@ func (this *StmtManager) PrepareOnce(preparer sqlPreparer, querySQL string, pare
 	}
 
 	// check if exists
-	this.locker.RLock()
+	this.mu.RLock()
 	stmt, ok := this.stmtMap[cacheKey]
 	if ok {
-		stmt.accessAt = timestamp
-		this.locker.RUnlock()
+		this.mu.RUnlock()
+
+		this.stmtLRU.TryTouch(cacheKey)
+
 		return stmt, true, nil
 	}
-	this.locker.RUnlock()
+	this.mu.RUnlock()
 
 	if ShowPreparedStatements {
 		logs.Println("[DB]prepare " + querySQL)
@@ -132,8 +139,8 @@ func (this *StmtManager) PrepareOnce(preparer sqlPreparer, querySQL string, pare
 	}
 	stmt = NewStmt(sqlStmt)
 
-	this.locker.Lock()
-	defer this.locker.Unlock()
+	this.mu.Lock()
+	defer this.mu.Unlock()
 
 	// exists, check again
 	_, exists := this.stmtMap[cacheKey]
@@ -141,15 +148,8 @@ func (this *StmtManager) PrepareOnce(preparer sqlPreparer, querySQL string, pare
 		return stmt, false, nil
 	}
 
-	// should we purge old statements?
-	if len(this.stmtMap) >= this.maxCount {
-		this.purge()
-
-		// still full
-		if len(this.stmtMap) >= this.maxCount {
-			return stmt, false, nil
-		}
-	}
+	// touch first to hold a position
+	this.stmtLRU.Touch(cacheKey)
 
 	// put stmt into cache map
 	this.stmtMap[cacheKey] = stmt
@@ -163,10 +163,11 @@ func (this *StmtManager) PrepareOnce(preparer sqlPreparer, querySQL string, pare
 func (this *StmtManager) Close() error {
 	this.isClosed = true
 
-	this.locker.Lock()
+	this.mu.Lock()
 	var stmtMap = this.stmtMap
 	this.stmtMap = map[string]*Stmt{}
-	this.locker.Unlock()
+	this.stmtLRU.Clear()
+	this.mu.Unlock()
 
 	var firstError error
 	for _, stmt := range stmtMap {
@@ -181,11 +182,11 @@ func (this *StmtManager) Close() error {
 
 func (this *StmtManager) CloseId(parentId int64) error {
 	// collect dirty stmts
-	this.locker.Lock()
+	this.mu.Lock()
 
 	cacheKeys, ok := this.subMap[parentId]
 	if !ok {
-		this.locker.Unlock()
+		this.mu.Unlock()
 		return nil
 	}
 	delete(this.subMap, parentId)
@@ -195,11 +196,13 @@ func (this *StmtManager) CloseId(parentId int64) error {
 		stmt, stmtOk := this.stmtMap[cacheKey]
 		if stmtOk {
 			dirtyStmts = append(dirtyStmts, stmt)
+
+			this.stmtLRU.Delete(cacheKey)
 			delete(this.stmtMap, cacheKey)
 		}
 	}
 
-	this.locker.Unlock()
+	this.mu.Unlock()
 
 	// close dirty stmts
 	var firstError error
@@ -214,32 +217,33 @@ func (this *StmtManager) CloseId(parentId int64) error {
 }
 
 func (this *StmtManager) Len() int {
-	this.locker.Lock()
-	defer this.locker.Unlock()
+	this.mu.Lock()
+	defer this.mu.Unlock()
 	return len(this.stmtMap)
 }
 
 func (this *StmtManager) purge() {
-	// remove old statements
-	var nowTime = time.Now().Unix()
-	var total = len(this.stmtMap)
-	var count = 0
-	for cacheKey, stmt := range this.stmtMap {
-		if stmt.accessAt < nowTime-3600 {
-			_ = stmt.Close()
-			delete(this.stmtMap, cacheKey)
-			count++
-		}
+	this.stmtLRU.Evict(4)
+}
+
+func (this *StmtManager) onEvict(keys []string) {
+	if len(keys) == 0 {
+		return
 	}
 
-	// too many left, we purge again
-	if count < total/100 {
-		for cacheKey, stmt := range this.stmtMap {
-			if stmt.accessAt < nowTime-900 {
-				_ = stmt.Close()
-				delete(this.stmtMap, cacheKey)
-				count++
-			}
+	var dirtyStmts = make([]*Stmt, 0, len(keys))
+
+	this.mu.Lock()
+	for _, key := range keys {
+		stmt, ok := this.stmtMap[key]
+		if ok {
+			delete(this.stmtMap, key)
+			dirtyStmts = append(dirtyStmts, stmt)
 		}
+	}
+	this.mu.Unlock()
+
+	for _, stmt := range dirtyStmts {
+		_ = stmt.Close()
 	}
 }
