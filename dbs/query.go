@@ -894,8 +894,8 @@ func (this *Query) AsSQL() (string, error) {
 			_, _ = this.builder.WriteString(this.partitionsSQL())
 			if this.savingFields.Len() > 0 {
 				var count = this.savingFields.Len()
-				var fieldNames = make([]string, 0, count)
-				var fieldValues = make([]string, 0, count)
+				var fieldNames = MakeSlice[string](count)
+				var fieldValues = MakeSlice[string](count)
 				this.savingFields.SortKeys()
 
 				var l int
@@ -932,8 +932,8 @@ func (this *Query) AsSQL() (string, error) {
 			_, _ = this.builder.WriteString(this.partitionsSQL())
 			if this.savingFields.Len() > 0 {
 				var count = this.savingFields.Len()
-				var fieldNames = make([]string, 0, count)
-				var fieldValues = make([]string, 0, count)
+				var fieldNames = MakeSlice[string](count)
+				var fieldValues = MakeSlice[string](count)
 				this.savingFields.SortKeys()
 				for field, value := range this.savingFields.Iterator() {
 					var w = this.wrapKeyword(field)
@@ -955,8 +955,8 @@ func (this *Query) AsSQL() (string, error) {
 			_, _ = this.builder.WriteString("\n")
 			_, _ = this.builder.WriteString(this.partitionsSQL())
 			if this.savingFields.Len() > 0 {
-				var fieldNames = make([]string, 0, this.savingFields.Len())
-				var fieldValues = make([]string, 0, this.savingFields.Len())
+				var fieldNames = MakeSlice[string](this.savingFields.Len())
+				var fieldValues = MakeSlice[string](this.savingFields.Len())
 				this.savingFields.SortKeys()
 				var l int
 				for field, value := range this.savingFields.Iterator() {
@@ -976,7 +976,7 @@ func (this *Query) AsSQL() (string, error) {
 			_, _ = this.builder.WriteString("\nON DUPLICATE KEY UPDATE\n")
 
 			if this.replacingFields.Len() > 0 {
-				var mapping = make([]string, 0, this.replacingFields.Len())
+				var mapping = MakeSlice[string](this.replacingFields.Len())
 				this.replacingFields.SortKeys()
 				var l int
 				for field, value := range this.replacingFields.Iterator() {
@@ -999,7 +999,7 @@ func (this *Query) AsSQL() (string, error) {
 	if this.action != QueryActionInsert && this.action != QueryActionReplace && this.action != QueryActionInsertOrUpdate {
 		var wheres []string
 		if this.attrs.Len()+len(this.wheres) > 0 {
-			wheres = make([]string, 0, this.attrs.Len()+len(this.wheres))
+			wheres = MakeSlice[string](this.attrs.Len() + len(this.wheres))
 		}
 		if this.attrs.Len() > 0 {
 			for _, placeholder := range this.attrs.Iterator() {
@@ -1038,7 +1038,7 @@ func (this *Query) AsSQL() (string, error) {
 
 	// orders
 	if len(this.orders) > 0 {
-		var orderStrings = make([]string, 0, len(this.orders))
+		var orderStrings = MakeSlice[string](len(this.orders))
 		for _, order := range this.orders {
 			var fieldString string
 			if _, ok := order.Field.(string); ok {
