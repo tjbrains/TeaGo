@@ -51,7 +51,14 @@ func IsTesting() bool {
 }
 
 func checkIsTesting() bool {
-	execFile := filepath.Base(os.Args[0])
+	if runtime.GOOS == "darwin" {
+		exe, _ := os.Executable()
+		if strings.HasSuffix(exe, "/build/bin/"+filepath.Base(exe)) {
+			return true
+		}
+	}
+
+	var execFile = filepath.Base(os.Args[0])
 	return execFile == "main" ||
 		execFile == "main.exe" ||
 		strings.HasPrefix(execFile, "___") ||
