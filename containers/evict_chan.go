@@ -4,7 +4,6 @@ package containers
 
 import (
 	"runtime"
-	"time"
 )
 
 type EvictInterface interface {
@@ -18,14 +17,13 @@ type EvictItem struct {
 }
 
 var sharedEvictChanList []chan EvictItem
-var numCPU = min(max(runtime.NumCPU()/4, 2), 16)
+var numCPU = min(max(runtime.NumCPU()/4, 2), 8)
 var testSingleEvictChan = false
 
 const evictBatchSize = 32
-const evictBatchDelay = 50 * time.Millisecond
 
 func init() {
-	const chanSize = 16 << 10
+	const chanSize = 32 << 10
 
 	for range numCPU {
 		var c = make(chan EvictItem, chanSize)
@@ -34,32 +32,26 @@ func init() {
 		go func() {
 			var keys = make([]any, 0, evictBatchSize)
 			var lastSet EvictInterface
-			var ticker = time.NewTicker(evictBatchDelay)
 
-			runtime.KeepAlive(ticker)
-
-			for {
-				select {
-				case item := <-c:
-					if lastSet == item.set {
-						keys = append(keys, item.key)
-						if len(keys) >= evictBatchSize {
-							lastSet.evict(keys)
-							keys = keys[:0]
-						}
-					} else {
-						// last
-						if lastSet != nil && len(keys) > 0 {
-							lastSet.evict(keys)
-						}
-
-						// current
-						lastSet = item.set
+			for item := range c {
+				if lastSet == item.set {
+					keys = append(keys, item.key)
+					if len(keys) >= evictBatchSize || len(c) == 0 /* no more left */ {
+						lastSet.evict(keys)
 						keys = keys[:0]
-						keys = append(keys, item.key)
 					}
-				case <-ticker.C:
-					if len(keys) > 0 {
+				} else {
+					// last
+					if lastSet != nil && len(keys) > 0 {
+						lastSet.evict(keys)
+					}
+
+					// current
+					lastSet = item.set
+					keys = keys[:0]
+					keys = append(keys, item.key)
+
+					if len(c) == 0 /* no more left */ {
 						lastSet.evict(keys)
 						keys = keys[:0]
 					}
