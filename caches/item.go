@@ -5,12 +5,12 @@ import "time"
 // Item 缓存条目定义
 type Item struct {
 	Key        string
-	Value      interface{}
+	Value      any
 	expireTime time.Time
 }
 
 // Set 设置值
-func (this *Item) Set(value interface{}) *Item {
+func (this *Item) Set(value any) *Item {
 	this.Value = value
 	return this
 }

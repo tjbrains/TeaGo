@@ -2,8 +2,9 @@ package lists
 
 import (
 	"fmt"
-	"github.com/tjbrains/TeaGo/assert"
 	"testing"
+
+	"github.com/tjbrains/TeaGo/assert"
 )
 
 func TestSliceContains(t *testing.T) {
@@ -38,7 +39,7 @@ func TestSliceContainsAny(t *testing.T) {
 
 func TestSliceMap(t *testing.T) {
 	s := []string{"a", "b", "c"}
-	t.Log(Map(s, func(k int, v interface{}) interface{} {
+	t.Log(Map(s, func(k int, v any) any {
 		return fmt.Sprintf("%d:%s", k, v)
 	}))
 }

@@ -5,7 +5,7 @@ import (
 )
 
 func TestListMap(t *testing.T) {
-	var list = NewList([]map[string]interface{}{
+	var list = NewList([]map[string]any{
 		{
 			"id":   10,
 			"name": "Zhang San",
@@ -23,16 +23,16 @@ func TestListMap(t *testing.T) {
 			"name": "Li Si",
 		},
 	})
-	ids := list.Map(func(k int, v interface{}) interface{} {
-		id := v.(map[string]interface{})["id"]
-		v.(map[string]interface{})["id"] = id.(int) * id.(int)
+	ids := list.Map(func(k int, v any) any {
+		var id = v.(map[string]any)["id"]
+		v.(map[string]any)["id"] = id.(int) * id.(int)
 		return v
 	})
 	t.Log(ids.Slice)
 }
 
 func TestListFilter(t *testing.T) {
-	var list = NewList([]map[string]interface{}{
+	var list = NewList([]map[string]any{
 		{
 			"id":   10,
 			"name": "Zhang San",
@@ -54,16 +54,16 @@ func TestListFilter(t *testing.T) {
 			"name": "Liu Mang",
 		},
 	})
-	result := list.Filter(func(k int, v interface{}) bool {
-		var id = v.(map[string]interface{})["id"].(int)
+	result := list.Filter(func(k int, v any) bool {
+		var id = v.(map[string]any)["id"].(int)
 		return id%2 == 1
 	})
 	t.Log(result)
-	t.Log(result.Slice.([]map[string]interface{}))
+	t.Log(result.Slice.([]map[string]any))
 }
 
 func TestListSize(t *testing.T) {
-	var list = NewList([]map[string]interface{}{
+	var list = NewList([]map[string]any{
 		{
 			"id":   10,
 			"name": "Zhang San",
@@ -151,7 +151,7 @@ func TestList_Remove(t *testing.T) {
 	//list.Remove(-2)
 	//t.Log(list.Slice)
 
-	list.KeepIf(func(k int, v interface{}) bool {
+	list.KeepIf(func(k int, v any) bool {
 		return k%2 == 0
 	})
 	t.Log(list)
@@ -166,17 +166,17 @@ func TestList_Set(t *testing.T) {
 func TestList_Find(t *testing.T) {
 	var list = NewList([]string{"a", "b", "c"})
 
-	v := list.Find(func(k int, v interface{}) bool {
+	v := list.Find(func(k int, v any) bool {
 		return k == 2
 	})
 	t.Log("v1:", v)
 
-	t.Log("v2:", list.FindIndex(func(k int, v interface{}) bool {
+	t.Log("v2:", list.FindIndex(func(k int, v any) bool {
 		return v == "b"
 	}))
 
 	t.Log("====")
-	t.Log(list.FindPair(func(k int, v interface{}) bool {
+	t.Log(list.FindPair(func(k int, v any) bool {
 		return v == "b"
 	}))
 
@@ -185,7 +185,7 @@ func TestList_Find(t *testing.T) {
 
 func TestList_FindAll(t *testing.T) {
 	var list = NewList([]string{"a", "b", "c", "d", "e"})
-	var result = list.FindAll(func(k int, v interface{}) bool {
+	var result = list.FindAll(func(k int, v any) bool {
 		return k%2 == 0
 	})
 	t.Log(result)

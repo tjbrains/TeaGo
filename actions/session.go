@@ -1,8 +1,9 @@
 package actions
 
 import (
-	"github.com/tjbrains/TeaGo/types"
 	"fmt"
+
+	"github.com/tjbrains/TeaGo/types"
 )
 
 // SESSION通用配置
@@ -22,7 +23,7 @@ type SessionWrapper interface {
 // Session定义
 type Session struct {
 	Sid     string
-	Manager interface{}
+	Manager any
 }
 
 // 设置sid

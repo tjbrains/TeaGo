@@ -1,9 +1,9 @@
 package commands
 
 import (
+	"github.com/goccy/go-yaml"
 	"github.com/tjbrains/TeaGo/cmd"
 	"github.com/tjbrains/TeaGo/dbs"
-	"gopkg.in/yaml.v3"
 )
 
 type InfoCommand struct {

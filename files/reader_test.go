@@ -1,9 +1,10 @@
 package files_test
 
 import (
+	"testing"
+
 	"github.com/tjbrains/TeaGo/Tea"
 	"github.com/tjbrains/TeaGo/files"
-	"testing"
 )
 
 func TestReader_ReadByte(t *testing.T) {
@@ -95,7 +96,7 @@ func TestReader_ReadJSON(t *testing.T) {
 
 	defer reader.Close()
 
-	dataMap := map[string]interface{}{}
+	dataMap := map[string]any{}
 	err = reader.ReadJSON(&dataMap)
 	if err != nil {
 		t.Fatal(err)
@@ -112,7 +113,7 @@ func TestReader_ReadYAML(t *testing.T) {
 
 	defer reader.Close()
 
-	dataMap := map[string]interface{}{}
+	dataMap := map[string]any{}
 	err = reader.ReadYAML(&dataMap)
 	if err != nil {
 		t.Fatal(err)

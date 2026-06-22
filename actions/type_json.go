@@ -1,3 +1,3 @@
 package actions
 
-type JSON map[string]interface{}
+type JSON map[string]any

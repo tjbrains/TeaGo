@@ -2,13 +2,6 @@ package actions
 
 import (
 	"encoding/json"
-	"github.com/tjbrains/TeaGo/Tea"
-	"github.com/tjbrains/TeaGo/files"
-	"github.com/tjbrains/TeaGo/gohtml"
-	"github.com/tjbrains/TeaGo/gohtml/atom"
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/maps"
-	"github.com/tjbrains/TeaGo/utils/string"
 	"html"
 	"net/url"
 	"os"
@@ -19,6 +12,14 @@ import (
 	"sync"
 	"text/template"
 	"time"
+
+	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/files"
+	"github.com/tjbrains/TeaGo/gohtml"
+	"github.com/tjbrains/TeaGo/gohtml/atom"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/maps"
+	stringutil "github.com/tjbrains/TeaGo/utils/string"
 )
 
 type TemplateCache struct {
@@ -298,7 +299,7 @@ func pathRelative(dir string, filename string, path string) string {
 	}
 }
 
-func createTeaFuncMap(tpl *Template, funcMap template.FuncMap, module string, dir string, filename string, data map[string]interface{}) template.FuncMap {
+func createTeaFuncMap(tpl *Template, funcMap template.FuncMap, module string, dir string, filename string, data map[string]any) template.FuncMap {
 	parent := filepath.Dir(strings.TrimPrefix(filename, dir))
 	if runtime.GOOS == "windows" {
 		parent = strings.Replace(parent, "\\", "/", -1)
@@ -307,7 +308,7 @@ func createTeaFuncMap(tpl *Template, funcMap template.FuncMap, module string, di
 		module = ""
 	}
 
-	actionData := map[string]interface{}{
+	actionData := map[string]any{
 		"data":        data,
 		"base":        "",
 		"module":      module,
@@ -489,7 +490,7 @@ window.TEA = {
 		return tpl.HasVar(s)
 	}
 
-	funcMap["isNil"] = func(s interface{}) bool {
+	funcMap["isNil"] = func(s any) bool {
 		return s == nil
 	}
 

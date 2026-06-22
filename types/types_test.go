@@ -108,7 +108,7 @@ func TestIsSlice(t *testing.T) {
 	}
 
 	{
-		var s interface{} = nil
+		var s any = nil
 		assert(t, !types.IsSlice(s))
 	}
 
@@ -126,17 +126,17 @@ func TestIsMap(t *testing.T) {
 	assert(t, !types.IsMap(nil))
 
 	{
-		var s map[string]interface{} = nil
+		var s map[string]any = nil
 		assert(t, types.IsMap(s))
 	}
 
 	{
-		var s interface{} = nil
+		var s any = nil
 		assert(t, !types.IsMap(s))
 	}
 
 	{
-		assert(t, types.IsMap(map[string]interface{}{
+		assert(t, types.IsMap(map[string]any{
 			"a": "b",
 		}))
 	}

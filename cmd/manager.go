@@ -2,14 +2,15 @@ package cmd
 
 import (
 	"errors"
-	"github.com/tjbrains/TeaGo/logs"
 	"log"
 	"reflect"
+
+	"github.com/tjbrains/TeaGo/logs"
 )
 
 var commandsPtrMap = map[string]CommandInterface{}
 
-func Register(cmdPtr interface{}) {
+func Register(cmdPtr any) {
 	command, ok := cmdPtr.(CommandInterface)
 	if !ok {
 		logs.Fatalf("command '%#v' must implement 'CommandInterface' interface", cmdPtr)

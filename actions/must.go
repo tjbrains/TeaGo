@@ -2,19 +2,20 @@ package actions
 
 import (
 	"fmt"
-	"github.com/tjbrains/TeaGo/lists"
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/types"
-	"github.com/tjbrains/TeaGo/utils/string"
 	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/tjbrains/TeaGo/lists"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/types"
+	stringutil "github.com/tjbrains/TeaGo/utils/string"
 )
 
 type Must struct {
 	action      *ActionObject
 	field       string
-	value       interface{}
+	value       any
 	valueString string
 	valueFloat  float64
 
@@ -45,7 +46,7 @@ func (this *Must) Trim() *Must {
 	return this
 }
 
-func (this *Must) Value(value interface{}) *Must {
+func (this *Must) Value(value any) *Must {
 	this.value = value
 
 	var reflectValue = reflect.ValueOf(value)
@@ -73,7 +74,7 @@ func (this *Must) Value(value interface{}) *Must {
 	return this
 }
 
-func (this *Must) Field(field string, value interface{}) *Must {
+func (this *Must) Field(field string, value any) *Must {
 	this.field = field
 	this.Value(value)
 	return this
@@ -95,7 +96,7 @@ func (this *Must) Require(message string) *Must {
 }
 
 // 判断是否在一个值列表中
-func (this *Must) In(values interface{}, message string) *Must {
+func (this *Must) In(values any, message string) *Must {
 	if this.HasErrors() {
 		return this
 	}
@@ -137,7 +138,7 @@ func (this *Must) MinLength(length int, message string) *Must {
 	return this
 }
 
-//  最大字符长度
+// 最大字符长度
 func (this *Must) MaxCharacters(charactersLength int, message string) *Must {
 	if this.HasErrors() {
 		return this
@@ -159,7 +160,7 @@ func (this *Must) MinCharacters(charactersLength int, message string) *Must {
 	return this
 }
 
-//  最大长度
+// 最大长度
 func (this *Must) MaxLength(length int, message string) *Must {
 	if this.HasErrors() {
 		return this

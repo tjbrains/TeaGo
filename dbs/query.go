@@ -10,7 +10,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/k0kubun/pp/v3"
 	"github.com/tjbrains/TeaGo/lists"
 	"github.com/tjbrains/TeaGo/logs"
 	"github.com/tjbrains/TeaGo/maps"
@@ -1112,7 +1111,7 @@ func (this *Query) AsSQL() (string, error) {
 	// debug
 	if this.debug {
 		logs.Debugf("SQL: %s", this.builder.String())
-		_, _ = pp.Printf("Params: %v", this.namedParams)
+		logs.Printf("Params: %v", this.namedParams)
 	}
 
 	return resultSQL, nil

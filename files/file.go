@@ -2,14 +2,15 @@ package files
 
 import (
 	"fmt"
-	"github.com/tjbrains/TeaGo/Tea"
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/utils/string"
 	"io"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/logs"
+	stringutil "github.com/tjbrains/TeaGo/utils/string"
 )
 
 // 文件对象定义
@@ -165,7 +166,7 @@ func (this *File) WriteString(data string) error {
 }
 
 // 写入格式化的字符串数据
-func (this *File) WriteFormat(format string, args ...interface{}) error {
+func (this *File) WriteFormat(format string, args ...any) error {
 	return this.WriteString(fmt.Sprintf(format, args...))
 }
 

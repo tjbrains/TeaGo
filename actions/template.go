@@ -2,17 +2,18 @@ package actions
 
 import (
 	"bytes"
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/maps"
 	"io"
 	"text/template"
+
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/maps"
 )
 
 // Template 模板定义
 type Template struct {
 	native *template.Template
 	vars   maps.Map
-	data   interface{}
+	data   any
 }
 
 // NewTemplate 创建新模板
@@ -42,7 +43,7 @@ func (this *Template) Parse(text string) (*Template, error) {
 }
 
 // ExecuteTemplate 执行模板
-func (this *Template) ExecuteTemplate(wr io.Writer, name string, data interface{}) error {
+func (this *Template) ExecuteTemplate(wr io.Writer, name string, data any) error {
 	if this.vars.Len() > 0 {
 		this.data = data
 	}
@@ -50,7 +51,7 @@ func (this *Template) ExecuteTemplate(wr io.Writer, name string, data interface{
 }
 
 // Execute 执行模板
-func (this *Template) Execute(wr io.Writer, data interface{}) error {
+func (this *Template) Execute(wr io.Writer, data any) error {
 	if this.vars.Len() > 0 {
 		this.data = data
 	}

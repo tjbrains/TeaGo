@@ -3,17 +3,18 @@ package actions
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/tjbrains/TeaGo/Tea"
-	"github.com/tjbrains/TeaGo/caches"
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/rands"
-	"github.com/tjbrains/TeaGo/types"
 	"net"
 	"net/http"
 	"path/filepath"
 	"strings"
 	"sync"
 	"text/template"
+
+	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/caches"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/rands"
+	"github.com/tjbrains/TeaGo/types"
 )
 
 type ActionObject struct {
@@ -34,7 +35,7 @@ type ActionObject struct {
 
 	pretty bool // 格式化输出
 
-	SessionManager    interface{}
+	SessionManager    any
 	sessionCookieName string
 	session           *Session
 	sessionLocker     sync.Mutex
@@ -51,9 +52,9 @@ type ActionObject struct {
 	Files []*File
 
 	next struct {
-		Action string                 `json:"action"`
-		Params map[string]interface{} `json:"params"`
-		Hash   string                 `json:"hash"`
+		Action string         `json:"action"`
+		Params map[string]any `json:"params"`
+		Hash   string         `json:"hash"`
 	}
 
 	writer ActionWriter
@@ -66,7 +67,7 @@ func (this *ActionObject) Object() *ActionObject {
 
 // 初始化动作
 func (this *ActionObject) init() {
-	this.Data = map[string]interface{}{}
+	this.Data = map[string]any{}
 }
 
 // SetParam 设置参数
@@ -209,7 +210,7 @@ func (this *ActionObject) Write(bytes []byte) (n int, err error) {
 }
 
 // WriteFormat 输出可以格式化的内容
-func (this *ActionObject) WriteFormat(format string, args ...interface{}) (n int, err error) {
+func (this *ActionObject) WriteFormat(format string, args ...any) (n int, err error) {
 	if len(args) > 0 {
 		format = fmt.Sprintf(format, args...)
 	}
@@ -217,7 +218,7 @@ func (this *ActionObject) WriteFormat(format string, args ...interface{}) (n int
 }
 
 // WriteJSON 写入JSON
-func (this *ActionObject) WriteJSON(value interface{}) {
+func (this *ActionObject) WriteJSON(value any) {
 	this.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	var jsonBytes, err = this.marshal(value)
@@ -329,7 +330,7 @@ func (this *ActionObject) failWithoutPanic() {
 }
 
 // SetSessionManager 设置Session管理器
-func (this *ActionObject) SetSessionManager(sessionManager interface{}) {
+func (this *ActionObject) SetSessionManager(sessionManager any) {
 	this.SessionManager = sessionManager
 }
 
@@ -387,7 +388,7 @@ func (this *ActionObject) View(viewTemplate string) {
 }
 
 // ViewFunc 设置模板文件中可以使用的自定义函数
-func (this *ActionObject) ViewFunc(name string, f interface{}) {
+func (this *ActionObject) ViewFunc(name string, f any) {
 	this.viewFuncMap[name] = f
 }
 
@@ -419,7 +420,7 @@ func (this *ActionObject) File(field string) *File {
 }
 
 // Next 设置下一个动作
-func (this *ActionObject) Next(nextAction string, params map[string]interface{}, hash ...string) *ActionObject {
+func (this *ActionObject) Next(nextAction string, params map[string]any, hash ...string) *ActionObject {
 	this.next.Action = nextAction
 	this.next.Params = params
 	if len(hash) > 0 {
@@ -456,7 +457,7 @@ func (this *ActionObject) TemplateFilter(filter func(body []byte) []byte) {
 }
 
 // marshal json
-func (this *ActionObject) marshal(value interface{}) ([]byte, error) {
+func (this *ActionObject) marshal(value any) ([]byte, error) {
 	if this.pretty {
 		return json.MarshalIndent(value, "", "   ")
 	}

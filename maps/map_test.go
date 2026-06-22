@@ -1,9 +1,10 @@
 package maps_test
 
 import (
+	"testing"
+
 	"github.com/tjbrains/TeaGo/assert"
 	"github.com/tjbrains/TeaGo/maps"
-	"testing"
 )
 
 func TestMap(t *testing.T) {
@@ -49,7 +50,7 @@ func TestNewMap(t *testing.T) {
 }
 
 func TestMapConvert(t *testing.T) {
-	var m = maps.NewMap(map[string]interface{}{
+	var m = maps.NewMap(map[string]any{
 		"name":     "Lu",
 		"age":      20,
 		"price":    123.45,
@@ -60,7 +61,7 @@ func TestMapConvert(t *testing.T) {
 }
 
 func TestMap_JSON(t *testing.T) {
-	var m = maps.NewMap(map[string]interface{}{
+	var m = maps.NewMap(map[string]any{
 		"name":     "Lu",
 		"age":      20,
 		"price":    123.45,
@@ -71,7 +72,7 @@ func TestMap_JSON(t *testing.T) {
 }
 
 func TestMap_DecodeJSON(t *testing.T) {
-	var m = maps.NewMap(map[string]interface{}{
+	var m = maps.NewMap(map[string]any{
 		"name":     "Lu",
 		"age":      20,
 		"price":    123.45,

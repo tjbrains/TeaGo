@@ -1,8 +1,9 @@
 package actions
 
 import (
-	"github.com/tjbrains/TeaGo/maps"
 	"sync"
+
+	"github.com/tjbrains/TeaGo/maps"
 )
 
 // ActionContext 上下文变量容器
@@ -19,14 +20,14 @@ func NewActionContext() *ActionContext {
 }
 
 // Set 设置变量
-func (this *ActionContext) Set(key string, value interface{}) {
+func (this *ActionContext) Set(key string, value any) {
 	this.locker.Lock()
 	defer this.locker.Unlock()
 	this.context[key] = value
 }
 
 // Get 获取变量
-func (this *ActionContext) Get(key string) interface{} {
+func (this *ActionContext) Get(key string) any {
 	this.locker.RLock()
 	defer this.locker.RUnlock()
 	return this.context.Get(key)

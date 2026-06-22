@@ -1,11 +1,12 @@
 package assert_test
 
 import (
-	"github.com/tjbrains/TeaGo/assert"
-	"github.com/tjbrains/TeaGo/maps"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/tjbrains/TeaGo/assert"
+	"github.com/tjbrains/TeaGo/maps"
 )
 
 func TestAssertion(t *testing.T) {
@@ -32,7 +33,7 @@ func TestAssertion_Contains(t *testing.T) {
 	a := assert.NewAssertion(t)
 	a.Contains([]string{"a", "b", "c"}, "a")
 	a.Contains([3]string{"a", "b", "c"}, "a")
-	a.Contains(map[string]interface{}{
+	a.Contains(map[string]any{
 		"a": "b",
 		"b": "c",
 		"d": "e",

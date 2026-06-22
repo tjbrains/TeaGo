@@ -2,10 +2,11 @@ package files
 
 import (
 	"encoding/json"
-	"gopkg.in/yaml.v3"
 	"io"
 	"os"
 	"sync"
+
+	"github.com/goccy/go-yaml"
 )
 
 type Writer struct {
@@ -33,7 +34,7 @@ func (this *Writer) WriteIOReader(reader io.Reader) (n int64, err error) {
 	return io.Copy(this.file, reader)
 }
 
-func (this *Writer) WriteJSON(value interface{}, pretty ...bool) (n int64, err error) {
+func (this *Writer) WriteJSON(value any, pretty ...bool) (n int64, err error) {
 	if len(pretty) == 0 || !pretty[0] {
 		data, err := json.Marshal(value)
 		if err != nil {
@@ -57,7 +58,7 @@ func (this *Writer) WriteJSON(value interface{}, pretty ...bool) (n int64, err e
 	return this.Write(data)
 }
 
-func (this *Writer) WriteYAML(value interface{}) (n int64, err error) {
+func (this *Writer) WriteYAML(value any) (n int64, err error) {
 	data, err := yaml.Marshal(value)
 	if err != nil {
 		return 0, err

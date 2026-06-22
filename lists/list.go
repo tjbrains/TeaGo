@@ -10,11 +10,11 @@ import (
 
 type List struct {
 	compareFunc func(i, j int) bool
-	Slice       interface{}
+	Slice       any
 }
 
 // 新建List对象
-func NewList(slice interface{}) *List {
+func NewList(slice any) *List {
 	return &List{
 		Slice: slice,
 	}
@@ -40,12 +40,12 @@ func (this *List) Sort(compareFunc func(i, j int) bool) {
 }
 
 // 遍历List，同Range()
-func (this *List) Each(iterator func(k int, v interface{})) {
+func (this *List) Each(iterator func(k int, v any)) {
 	this.Range(iterator)
 }
 
 // 遍历List，同Each()
-func (this *List) Range(iterator func(k int, v interface{})) {
+func (this *List) Range(iterator func(k int, v any)) {
 	value := reflect.ValueOf(this.Slice)
 	count := value.Len()
 	for i := 0; i < count; i++ {
@@ -54,10 +54,10 @@ func (this *List) Range(iterator func(k int, v interface{})) {
 }
 
 // 对容器中元素应用迭代器,并将每次执行的结果放入新List中
-func (this *List) Map(mapFunc func(k int, v interface{}) interface{}) *List {
+func (this *List) Map(mapFunc func(k int, v any) any) *List {
 	value := reflect.ValueOf(this.Slice)
 
-	newValue := reflect.ValueOf([]interface{}{})
+	newValue := reflect.ValueOf([]any{})
 	result := &List{
 		Slice: newValue.Interface(),
 	}
@@ -124,7 +124,7 @@ func (this *List) Find(iterator func(k int, v interface{}) bool) interface{} {
 }
 
 // 查找元素，返回键值对
-func (this *List) FindPair(iterator func(k int, v interface{}) bool) (index int, v interface{}) {
+func (this *List) FindPair(iterator func(k int, v any) bool) (index int, v any) {
 	value := reflect.ValueOf(this.Slice)
 	count := value.Len()
 	if count == 0 {

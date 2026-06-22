@@ -11,11 +11,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/goccy/go-yaml"
 	"github.com/tjbrains/TeaGo/Tea"
 	"github.com/tjbrains/TeaGo/logs"
 	"github.com/tjbrains/TeaGo/maps"
 	"github.com/tjbrains/TeaGo/types"
-	"gopkg.in/yaml.v3"
 )
 
 type DB struct {
@@ -155,7 +155,7 @@ func loadConfig() {
 			return
 		}
 
-		err := yaml.Unmarshal(configFileData, &dbConfig)
+		err := yaml.Unmarshal(configFileData, dbConfig)
 		if err != nil {
 			logs.Errorf("[DB]decode database config failed: %s", err.Error())
 			return

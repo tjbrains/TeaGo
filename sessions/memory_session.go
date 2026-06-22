@@ -1,13 +1,14 @@
 package sessions
 
 import (
-	"github.com/tjbrains/TeaGo/actions"
 	"sync"
 	"time"
+
+	"github.com/tjbrains/TeaGo/actions"
 )
 
 type MemorySessionManager struct {
-	sessionMap map[string]map[string]interface{} // sid => { expiredAt, items }
+	sessionMap map[string]map[string]any // sid => { expiredAt, items }
 	life       uint
 
 	isInitialized bool
@@ -17,7 +18,7 @@ type MemorySessionManager struct {
 
 func NewMemorySessionManager() *MemorySessionManager {
 	return &MemorySessionManager{
-		sessionMap: map[string]map[string]interface{}{},
+		sessionMap: map[string]map[string]any{},
 		life:       1200,
 	}
 }
@@ -30,7 +31,7 @@ func (this *MemorySessionManager) Init(config *actions.SessionConfig) {
 	this.isInitialized = true
 
 	this.life = config.Life
-	this.sessionMap = map[string]map[string]interface{}{}
+	this.sessionMap = map[string]map[string]any{}
 
 	// 定期清除过期的SESSION
 	tick := time.NewTicker(1800 * time.Second)
@@ -75,7 +76,7 @@ func (this *MemorySessionManager) WriteItem(sid string, key string, value string
 	defer this.locker.Unlock()
 
 	items[key] = value
-	this.sessionMap[sid] = map[string]interface{}{
+	this.sessionMap[sid] = map[string]any{
 		"expiredAt": time.Now().Unix() + int64(this.life),
 		"items":     items,
 	}

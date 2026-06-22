@@ -2,15 +2,16 @@ package logs_test
 
 import (
 	"errors"
-	"github.com/tjbrains/TeaGo/logs"
 	"testing"
+
+	"github.com/tjbrains/TeaGo/logs"
 )
 
 func TestDump(t *testing.T) {
-	var m = map[string]interface{}{
+	var m = map[string]any{
 		"name": "Liu",
 		"age":  20,
-		"book": map[string]interface{}{
+		"book": map[string]any{
 			"name":  "Golang",
 			"price": 20.00,
 		},

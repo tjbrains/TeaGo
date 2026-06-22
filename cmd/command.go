@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/tjbrains/TeaGo/logs"
 	"os"
 	"strings"
+
+	"github.com/tjbrains/TeaGo/logs"
 )
 
 var commandArgs = os.Args[1:]
@@ -24,7 +25,7 @@ func (this *Command) Arg(index int) (value string, found bool) {
 	return commandArgs[index], true
 }
 
-func (this *Command) Output(message ...interface{}) {
+func (this *Command) Output(message ...any) {
 	for index, arg := range message {
 
 		_, ok := arg.(string)
@@ -40,11 +41,11 @@ func (this *Command) Output(message ...interface{}) {
 	}
 }
 
-func (this *Command) Println(message ...interface{}) {
+func (this *Command) Println(message ...any) {
 	logs.Println(message...)
 }
 
-func (this *Command) Printf(format string, args ...interface{}) {
+func (this *Command) Printf(format string, args ...any) {
 	logs.Printf(format, args...)
 }
 

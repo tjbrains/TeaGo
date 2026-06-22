@@ -1,14 +1,15 @@
 package TeaGo
 
 import (
-	"github.com/tjbrains/TeaGo/Tea"
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/utils/string"
-	"gopkg.in/yaml.v3"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/goccy/go-yaml"
+	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/logs"
+	stringutil "github.com/tjbrains/TeaGo/utils/string"
 )
 
 // ServerConfig 服务配置
@@ -30,7 +31,7 @@ type ServerConfig struct {
 		MaxSize      string `yaml:"maxSize" json:"maxSize"` // 允许上传的最大尺寸
 		maxSizeFloat float64
 	} `yaml:"upload" json:"upload"` // 上传配置
-	Errors map[string]interface{} `yaml:"errors" json:"errors"` // 错误配置
+	Errors map[string]any `yaml:"errors" json:"errors"` // 错误配置
 }
 
 func (this *ServerConfig) Load() {
@@ -94,7 +95,7 @@ func (this *ServerConfig) processError(request *http.Request, response io.Writer
 		http.Error(response.(http.ResponseWriter), message, code)
 		return
 	}
-	mapConfig, ok := errorConfig.(map[string]interface{})
+	mapConfig, ok := errorConfig.(map[string]any)
 	if !ok {
 		http.Error(response.(http.ResponseWriter), message, code)
 		return
@@ -115,7 +116,7 @@ func (this *ServerConfig) processError(request *http.Request, response io.Writer
 		logs.Println(viewFile)
 		/**viewFileString, ok := viewFile.(string)
 		if ok {
-			data := map[string]interface{}{
+			data := map[string]any{
 				"Request": request,
 			}
 			response.(http.ResponseWriter).WriteHeader(http.StatusNotFound)

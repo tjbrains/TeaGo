@@ -2,11 +2,12 @@ package files
 
 import (
 	"encoding/json"
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/maps"
-	"gopkg.in/yaml.v3"
 	"io"
 	"os"
+
+	"github.com/goccy/go-yaml"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/maps"
 )
 
 type Reader struct {
@@ -62,7 +63,7 @@ func (this *Reader) ReadAll() []byte {
 }
 
 // 从JSON文件中读取数据
-func (this *Reader) ReadJSON(ptr interface{}) error {
+func (this *Reader) ReadJSON(ptr any) error {
 	data := this.ReadAll()
 	return json.Unmarshal(data, ptr)
 }
@@ -75,7 +76,7 @@ func (this *Reader) ReadJSONMap() (maps.Map, error) {
 }
 
 // 从YAML文件中读取数据
-func (this *Reader) ReadYAML(ptr interface{}) error {
+func (this *Reader) ReadYAML(ptr any) error {
 	data := this.ReadAll()
 	return yaml.Unmarshal(data, ptr)
 }

@@ -2,14 +2,15 @@ package maps
 
 import (
 	"encoding/json"
-	"github.com/tjbrains/TeaGo/types"
 	"reflect"
+
+	"github.com/tjbrains/TeaGo/types"
 )
 
-type Map map[string]interface{}
+type Map map[string]any
 
 // NewMap 新建Map
-func NewMap(maps ...interface{}) Map {
+func NewMap(maps ...any) Map {
 	m := Map{}
 	for _, mp := range maps {
 		v := reflect.ValueOf(mp)
@@ -35,8 +36,8 @@ func DecodeJSON(jsonData []byte) (Map, error) {
 }
 
 // Keys 取得所有键
-func (this Map) Keys() []interface{} {
-	m := []interface{}{}
+func (this Map) Keys() []any {
+	m := []any{}
 	for key := range this {
 		m = append(m, key)
 	}
@@ -44,7 +45,7 @@ func (this Map) Keys() []interface{} {
 }
 
 // Values 取得所有值
-func (this Map) Values() []interface{} {
+func (this Map) Values() []any {
 	m := []any{}
 	for _, value := range this {
 		m = append(m, value)

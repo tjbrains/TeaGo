@@ -3,15 +3,16 @@ package sessions
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/tjbrains/TeaGo/Tea"
-	"github.com/tjbrains/TeaGo/actions"
-	"github.com/tjbrains/TeaGo/files"
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/utils/string"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/tjbrains/TeaGo/Tea"
+	"github.com/tjbrains/TeaGo/actions"
+	"github.com/tjbrains/TeaGo/files"
+	"github.com/tjbrains/TeaGo/logs"
+	stringutil "github.com/tjbrains/TeaGo/utils/string"
 )
 
 type FileSessionManager struct {
@@ -255,11 +256,9 @@ func (this *FileSessionManager) load() {
 	// 更新：1分钟更新一次时间
 	go func() {
 		timeInterval := 60
-		ticker := time.NewTicker(time.Duration(timeInterval) * time.Second)
-		for {
-			<-ticker.C
-
-			this.sessionMap.Range(func(key, value interface{}) bool {
+		var ticker = time.NewTicker(time.Duration(timeInterval) * time.Second)
+		for range ticker.C {
+			this.sessionMap.Range(func(key, value any) bool {
 				sessionObject := value.(*FileSessionData)
 				if sessionObject.isExpired() {
 					this.sessionMap.Delete(key)

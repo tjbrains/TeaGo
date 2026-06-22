@@ -1,9 +1,6 @@
 package actions
 
 import (
-	"github.com/tjbrains/TeaGo/lists"
-	"github.com/tjbrains/TeaGo/logs"
-	"github.com/tjbrains/TeaGo/types"
 	"net/http"
 	"path/filepath"
 	"reflect"
@@ -12,6 +9,10 @@ import (
 	"strings"
 	"text/template"
 	"unicode"
+
+	"github.com/tjbrains/TeaGo/lists"
+	"github.com/tjbrains/TeaGo/logs"
+	"github.com/tjbrains/TeaGo/types"
 )
 
 type Params map[string][]string
@@ -35,14 +36,14 @@ type ActionWrapper interface {
 }
 
 // RunAction 执行某个Action
-func RunAction(actionPtr interface{},
+func RunAction(actionPtr any,
 	spec *ActionSpec,
 	request *http.Request,
 	responseWriter http.ResponseWriter,
 	params Params,
-	helpers []interface{},
+	helpers []any,
 	initData Data,
-) interface{} {
+) any {
 	// 运行
 	action := actionPtr.(ActionWrapper).Object()
 	runActionCopy(spec, request, responseWriter, params, action.SessionManager, action.sessionCookieName, action.maxSize, helpers, initData)
@@ -55,10 +56,10 @@ func runActionCopy(spec *ActionSpec,
 	request *http.Request,
 	responseWriter http.ResponseWriter,
 	params Params,
-	sessionManager interface{},
+	sessionManager any,
 	sessionCookieName string,
 	maxSize float64,
-	helpers []interface{},
+	helpers []any,
 	initData Data,
 ) {
 	var actionPtrValue = spec.NewPtrValue()
