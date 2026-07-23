@@ -151,15 +151,23 @@ func assert(t *testing.T, b bool) {
 func BenchmarkInt_String(b *testing.B) {
 	runtime.GOMAXPROCS(1)
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = types.String(1024)
+	}
+}
+
+func BenchmarkInt_String_Int32(b *testing.B) {
+	runtime.GOMAXPROCS(1)
+
+	for b.Loop() {
+		_ = types.String(int32(1024))
 	}
 }
 
 func BenchmarkInt_Sprintf(b *testing.B) {
 	runtime.GOMAXPROCS(1)
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = fmt.Sprintf("%d", 1024)
 	}
 }
