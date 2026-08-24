@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/tjbrains/TeaGo/utils/string"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/tjbrains/TeaGo/utils/string"
 )
 
 type Writer interface {
@@ -260,7 +261,9 @@ func PrintAsJSON(value any, t ...*testing.T) {
 
 	if len(t) > 0 {
 		for _, t1 := range t {
-			t1.Log(string(data))
+			if t1 != nil {
+				t1.Log(string(data))
+			}
 		}
 	} else {
 		Println(string(data))
