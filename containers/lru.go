@@ -3,8 +3,9 @@
 package containers
 
 import (
-	"testing"
 	"time"
+
+	"github.com/tjbrains/TeaGo/logs"
 )
 
 type LRUFunc[K comparable] func(lru *LRU[K])
@@ -107,7 +108,7 @@ func (this *LRU[K]) Close() {
 	this.rawSet.Close()
 }
 
-func (this *LRU[K]) Inspect(t *testing.T) {
+func (this *LRU[K]) Inspect(t logs.TestingInterface) {
 	this.rawSet.Inspect(t)
 }
 

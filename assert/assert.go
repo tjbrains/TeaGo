@@ -8,23 +8,23 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
-	"testing"
 	"time"
 
+	"github.com/tjbrains/TeaGo/logs"
 	"github.com/tjbrains/TeaGo/types"
 	stringutil "github.com/tjbrains/TeaGo/utils/string"
 )
 
 // Assertion 断言定义
 type Assertion struct {
-	t         *testing.T
+	t         logs.TestingInterface
 	beginTime time.Time
 	quiet     bool // 是否为静默模式，此模式下的测试通过的项不会提示
 	isPassed  bool
 }
 
 // NewAssertion 取得一个新的断言
-func NewAssertion(t *testing.T) *Assertion {
+func NewAssertion(t logs.TestingInterface) *Assertion {
 	return &Assertion{
 		t:         t,
 		beginTime: time.Now(),
