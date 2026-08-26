@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"testing"
 	"time"
+
+	"github.com/tjbrains/TeaGo/logs"
 )
 
 type Testing struct {
@@ -18,7 +19,7 @@ type Testing struct {
 	cost       bool
 }
 
-// 新建测试实例
+// NewTesting 新建测试实例
 func NewTesting(actionPtr ActionWrapper) *Testing {
 	return &Testing{
 		actionPtr: actionPtr,
@@ -27,50 +28,50 @@ func NewTesting(actionPtr ActionWrapper) *Testing {
 	}
 }
 
-// 设置参数
+// Params 设置参数
 func (this *Testing) Params(params Params) *Testing {
 	this.params = params
 	return this
 }
 
-// 设置请求方法
+// Method 设置请求方法
 func (this *Testing) Method(method string) *Testing {
 	this.method = method
 	return this
 }
 
-// 设置URL
+// URL 设置URL
 func (this *Testing) URL(urlString string) *Testing {
 	this.requestURL = urlString
 	return this
 }
 
-// 设置终端地址
+// RemoteAddr 设置终端地址
 func (this *Testing) RemoteAddr(remoteAddr string) *Testing {
 	this.remoteAddr = remoteAddr
 	return this
 }
 
-// 添加Header
+// AddHeader 添加Header
 func (this *Testing) AddHeader(key string, value string) *Testing {
 	this.header.Add(key, value)
 	return this
 }
 
-// 设置Header
+// SetHeader 设置Header
 func (this *Testing) SetHeader(key string, value string) *Testing {
 	this.header.Set(key, value)
 	return this
 }
 
-// 计算耗时
+// Cost 计算耗时
 func (this *Testing) Cost() *Testing {
 	this.cost = true
 	return this
 }
 
-// 执行
-func (this *Testing) Run(t *testing.T) *TestingResponseWriter {
+// Run 执行
+func (this *Testing) Run(t logs.TestingInterface) *TestingResponseWriter {
 	values := url.Values{}
 
 	for k, v := range this.params {

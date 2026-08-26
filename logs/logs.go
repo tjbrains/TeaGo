@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"testing"
 
 	"github.com/tjbrains/TeaGo/utils/string"
 )
@@ -252,7 +251,7 @@ func Dump(variable any) {
 	Printf("<code>%s</code>", buffer.String())
 }
 
-func PrintAsJSON(value any, t ...*testing.T) {
+func PrintAsJSON(value any, t ...TestingInterface) {
 	data, err := json.MarshalIndent(value, "", "   ")
 	if err != nil {
 		Error(err)

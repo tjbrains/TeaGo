@@ -7,7 +7,6 @@ import (
 	"math/rand/v2"
 	"sync"
 	"sync/atomic"
-	"testing"
 
 	"github.com/tidwall/btree"
 	"github.com/tjbrains/TeaGo/logs"
@@ -399,7 +398,7 @@ func (this *Set[K, N]) Close() {
 	}
 }
 
-func (this *Set[K, N]) Inspect(t *testing.T) {
+func (this *Set[K, N]) Inspect(t logs.TestingInterface) {
 	t.Log("===[KEY => NUMBER]===")
 	logs.PrintAsJSON(this.keyMap, t)
 
