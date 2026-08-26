@@ -115,9 +115,9 @@ func NewInstanceFromConfig(config *DBConfig) (*DB, error) {
 	}
 
 	// close when finalize
-	runtime.SetFinalizer(db, func(db *DB) {
+	runtime.AddCleanup(db, func(s int) {
 		_ = db.Close()
-	})
+	}, 1)
 
 	db.config = config
 	db.rawDB = sqlDb
@@ -386,7 +386,7 @@ func (this *DB) FindOnesSeq(query string, args ...any) (seq iter.Seq[maps.Map], 
 		return
 	}
 
-	seq = iter.Seq[maps.Map](func(yield func(v maps.Map) bool) {
+	seq = func(yield func(v maps.Map) bool) {
 		defer func() {
 			_ = rows.Close()
 		}()
@@ -396,7 +396,7 @@ func (this *DB) FindOnesSeq(query string, args ...any) (seq iter.Seq[maps.Map], 
 				return
 			}
 		}
-	})
+	}
 
 	return
 }

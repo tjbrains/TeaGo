@@ -47,7 +47,7 @@ func (this *Rows) FindOnes() (ones []maps.Map, err error) {
 
 	var countColumns = len(columnNames)
 	var valuePointers = []any{}
-	for i := 0; i < countColumns; i++ {
+	for range countColumns {
 		var v any
 		valuePointers = append(valuePointers, &v)
 	}
@@ -59,7 +59,7 @@ func (this *Rows) FindOnes() (ones []maps.Map, err error) {
 		}
 
 		var rowMap = maps.Map{}
-		for i := 0; i < countColumns; i++ {
+		for i := range countColumns {
 			var pointer = valuePointers[i]
 			var value = *(pointer.(*any))
 
@@ -96,7 +96,7 @@ func (this *Rows) FindOnesSeq() (seq iter.Seq[maps.Map], err error) {
 		valuePointers = append(valuePointers, &v)
 	}
 
-	seq = iter.Seq[maps.Map](func(yield func(m maps.Map) bool) {
+	seq = func(yield func(m maps.Map) bool) {
 		for this.rawRows.Next() {
 			err = this.rawRows.Scan(valuePointers...)
 			if err != nil {
@@ -122,7 +122,7 @@ func (this *Rows) FindOnesSeq() (seq iter.Seq[maps.Map], err error) {
 				return
 			}
 		}
-	})
+	}
 
 	if err != nil {
 		return

@@ -2,11 +2,12 @@ package dbs_test
 
 import (
 	"encoding/json"
-	"github.com/tjbrains/TeaGo/dbs"
-	"github.com/tjbrains/TeaGo/logs"
 	"log"
 	"testing"
 	"time"
+
+	"github.com/tjbrains/TeaGo/dbs"
+	"github.com/tjbrains/TeaGo/logs"
 )
 
 func TestDBName(t *testing.T) {
@@ -37,11 +38,14 @@ func TestDB_FindFullTable(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
+	defer func() {
+		_ = db.Close()
+	}()
 
 	table, err := db.FindFullTable("pp_shopPlayLogs")
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 	jsonBytes, _ := json.MarshalIndent(table.Partitions, "", "   ")
 	t.Log(string(jsonBytes))
@@ -55,7 +59,9 @@ func TestDB_FindFunctions(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
+	defer func() {
+		_ = db.Close()
+	}()
 
 	functions, err := db.FindFunctions()
 	if err != nil {
@@ -87,8 +93,8 @@ func TestDB_FindPreparedOnes(t *testing.T) {
 
 	var count = 10000
 	var before = time.Now()
-	for i := 0; i < count; i++ {
-		_, _, err := db.FindPreparedOnes("SELECT 1")
+	for range count {
+		_, _, err = db.FindPreparedOnes("SELECT 1")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -96,8 +102,8 @@ func TestDB_FindPreparedOnes(t *testing.T) {
 	t.Log("FindPreparedOnes():", time.Since(before).Seconds()*1000, "ms")
 
 	before = time.Now()
-	for i := 0; i < count; i++ {
-		_, _, err := db.FindOnes("SELECT 1")
+	for range count {
+		_, _, err = db.FindOnes("SELECT 1")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -118,6 +124,52 @@ func TestDB_FindOnes(t *testing.T) {
 
 	t.Log(columnNames)
 	logs.PrintAsJSON(ones, t)
+}
+
+func TestDB_FindOnesSeq(t *testing.T) {
+	db, err := dbs.Default()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		_ = db.Close()
+	}()
+
+	ones, columnNames, err := db.FindOnesSeq("SELECT id, name FROM users LIMIT 2")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log("columnNames:", columnNames)
+	for one := range ones {
+		t.Log(one)
+	}
+
+	_ = ones
+}
+
+func TestDB_FindOnesSeq_NotFound(t *testing.T) {
+	db, err := dbs.Default()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		_ = db.Close()
+	}()
+
+	ones, columnNames, err := db.FindOnesSeq("SELECT id, name FROM users WHERE id=1000000 LIMIT 2")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log("columnNames:", columnNames)
+	for one := range ones {
+		t.Log(one)
+	}
+
+	_ = ones
 }
 
 func TestDB_FindOne(t *testing.T) {
