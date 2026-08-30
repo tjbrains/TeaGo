@@ -114,10 +114,11 @@ func NewInstanceFromConfig(config *DBConfig) (*DB, error) {
 		stmtManager: NewStmtManager(),
 	}
 
-	// close when finalize
-	runtime.AddCleanup(db, func(s int) {
-		_ = db.Close()
-	}, 1)
+	// Must not close over db: that would keep it reachable so cleanup never runs.
+	runtime.AddCleanup(db, closeUnreachableDB, dbCleanupArg{
+		rawDB:       sqlDb,
+		stmtManager: db.stmtManager,
+	})
 
 	db.config = config
 	db.rawDB = sqlDb
@@ -332,6 +333,22 @@ func (this *DB) Close() error {
 	err := this.rawDB.Close()
 
 	return anyError(err, err1)
+}
+
+// dbCleanupArg holds resources that must outlive *DB for AddCleanup.
+// It must not contain a pointer back to the *DB being collected.
+type dbCleanupArg struct {
+	rawDB       *sql.DB
+	stmtManager *StmtManager
+}
+
+func closeUnreachableDB(arg dbCleanupArg) {
+	if arg.stmtManager != nil {
+		_ = arg.stmtManager.Close()
+	}
+	if arg.rawDB != nil {
+		_ = arg.rawDB.Close()
+	}
 }
 
 func (db *DB) Exec(query string, params ...any) (sql.Result, error) {
