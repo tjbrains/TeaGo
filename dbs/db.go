@@ -114,10 +114,10 @@ func NewInstanceFromConfig(config *DBConfig) (*DB, error) {
 		stmtManager: NewStmtManager(),
 	}
 
-	// close when finalize
-	runtime.AddCleanup(db, func(s int) {
-		_ = db.Close()
-	}, 1)
+	runtime.AddCleanup(db, closeDBFunc, closeDBFuncArgs{
+		rawDB:       sqlDb,
+		stmtManager: db.stmtManager,
+	})
 
 	db.config = config
 	db.rawDB = sqlDb
@@ -332,6 +332,20 @@ func (this *DB) Close() error {
 	err := this.rawDB.Close()
 
 	return anyError(err, err1)
+}
+
+type closeDBFuncArgs struct {
+	rawDB       *sql.DB
+	stmtManager *StmtManager
+}
+
+func closeDBFunc(arg closeDBFuncArgs) {
+	if arg.stmtManager != nil {
+		_ = arg.stmtManager.Close()
+	}
+	if arg.rawDB != nil {
+		_ = arg.rawDB.Close()
+	}
 }
 
 func (db *DB) Exec(query string, params ...any) (sql.Result, error) {
